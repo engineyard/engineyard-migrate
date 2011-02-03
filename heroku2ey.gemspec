@@ -25,5 +25,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency("rake", ["~> 0.8.7"])
   s.add_development_dependency("cucumber", ["~> 0.10.0"])
+  s.add_development_dependency("cucumber-rails", ["~> 0.3.2"])
   s.add_development_dependency("rspec", ["~> 2.2.0"])
+  s.add_development_dependency("nokogiri", ["~> 1.4.0"])
 end

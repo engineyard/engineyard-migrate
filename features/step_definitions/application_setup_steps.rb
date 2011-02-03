@@ -45,6 +45,7 @@ end
 
 Given /^I have a Heroku application "([^"]*)"$/ do |name|
   @heroku_name = name
+  @heroku_host = "#{name}.heroku.com"
   in_project_folder do
     system "git remote rm heroku"
     system "git remote add heroku git@heroku.com:#{name}.git"
@@ -81,5 +82,6 @@ end
 
 Given /^I have an AppCloud account "([^"]*)" with environment "([^"]*)"$/ do |account, environment|
   @appcloud_account, @appcloud_environment = account, environment
+  @appcloud_host = "google.com" # TODO
 end
 

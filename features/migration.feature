@@ -11,22 +11,22 @@ Feature: Migration
     And I have a Heroku application "heroku2ey-simple-app"
     And it has production data
     When I visit the Heroku application
-    Then I should see table "#people"
-      | Person |
+    Then I should see table
+      | People |
       | Dr Nic |
       | Danish |
 
     And I have setup my AppCloud credentials
     And I have an AppCloud account "heroku2ey" with environment "heroku2eysimpleapp_production"
     When I visit the AppCloud application
-    Then I should see table "#people"
-      | Person |
+    Then I should see table
+      | People |
 
     When I run local executable "heroku2ey" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see "Migration complete!"
     When I visit the AppCloud application
-    Then I should see table "#people"
-      | Person |
+    Then I should see table
+      | People |
       | Dr Nic |
       | Danish |
   

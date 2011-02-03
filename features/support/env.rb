@@ -1,5 +1,8 @@
 $:.unshift(File.expand_path(File.dirname(__FILE__) + '/../../lib'))
 require 'bundler/setup'
+require 'net/http'
+
+require 'cucumber/web/tableish'
 
 [$stdout, $stderr].each { |pipe| pipe.sync = true }
 
