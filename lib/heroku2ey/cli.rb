@@ -1,8 +1,10 @@
 require 'thor'
 require 'net/http'
 require 'uri'
-require 'heroku2ey/engineyard/appcloud_env'
 require 'engineyard/thor'
+require "engineyard/cli"
+require "engineyard/cli/ui"
+require "engineyard/error"
 
 module Heroku2EY
   class CLI < Thor
@@ -22,16 +24,8 @@ module Heroku2EY
         say "framework_env: "; say "#{environment.framework_env}", :green
         say "cluster size:  "; say "#{environment.instances_count}", :green
       end
-      # say environments.inspect
-      # 
-      # if environments.size == 0
-      #   no_environments_discovered and return
-      # elsif environments.size > 1
-      #   too_many_environments_discovered("migrate", environments) and return
-      # end
-      # 
-      # env_name, account_name, environment = environments.first
-      # say [env_name, account_name, environment].inspect, :green
+      
+      say "Migration complete!", :green
     end
     
     map "-v" => :version, "--version" => :version, "-h" => :help, "--help" => :help
