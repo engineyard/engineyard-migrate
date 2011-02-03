@@ -6,11 +6,11 @@ Gem::Specification.new do |s|
   s.name        = "heroku2ey"
   s.version     = Heroku2ey::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.authors     = ["Dr Nic Williams", "Danish Khan"]
+  s.email       = ["drnicwilliams@gmail.com"]
+  s.homepage    = "https://github.com/engineyard/heroku2ey"
+  s.summary     = %q{Salesforce Heroku to Engine Yard AppCloud migration tool.}
+  s.description = %q{Migrating your Ruby/Rails application from Salesforce Heroku to Engine Yard AppCloud made simple!}
 
   s.rubyforge_project = "heroku2ey"
 
@@ -18,4 +18,8 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
+  s.add_development_dependency("rake", ["~> 0.8.7"])
+  s.add_development_dependency("cucumber", ["~> 0.9.4"])
+  s.add_development_dependency("rspec", ["~> 2.2.0"])
 end
