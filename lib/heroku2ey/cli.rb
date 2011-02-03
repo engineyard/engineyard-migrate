@@ -2,24 +2,36 @@ require 'thor'
 require 'net/http'
 require 'uri'
 require 'heroku2ey/engineyard/appcloud_env'
+require 'engineyard/thor'
 
 module Heroku2EY
   class CLI < Thor
+    include EY::UtilityMethods
 
     desc "migrate PATH", "Migrate this Heroku app to Engine Yard AppCloud"
     method_option :verbose, :aliases     => ["-V"], :desc => "Display more output"
     method_option :environment, :aliases => ["-e"], :desc => "Environment in which to deploy this application", :type => :string
     method_option :account, :aliases     => ["-c"], :desc => "Name of the account you want to deploy in"
     def migrate(path)
-      environments = Heroku2EY::Engineyard::AppcloudEnv.new.find_environments(options)
-      if environments.size == 0
-        no_environments_discovered and return
-      elsif environments.size > 1
-        too_many_environments_discovered("migrate", environments) and return
+      error "Path '#{path}' does not exist" unless File.exists? path
+      FileUtils.chdir(path) do
+        app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
+        # [EY::Model::App, EY::Model::Environment]
+        say "account:       "; say "#{environment.account.name}", :green
+        say "environment:   "; say "#{environment.name}", :green
+        say "framework_env: "; say "#{environment.framework_env}", :green
+        say "cluster size:  "; say "#{environment.instances_count}", :green
       end
-      
-      env_name, account_name, environment = environments.first
-      say [env_name, account_name, environment].inspect, :green
+      # say environments.inspect
+      # 
+      # if environments.size == 0
+      #   no_environments_discovered and return
+      # elsif environments.size > 1
+      #   too_many_environments_discovered("migrate", environments) and return
+      # end
+      # 
+      # env_name, account_name, environment = environments.first
+      # say [env_name, account_name, environment].inspect, :green
     end
     
     map "-v" => :version, "--version" => :version, "-h" => :help, "--help" => :help
@@ -50,7 +62,7 @@ module Heroku2EY
       say "Multiple environments possible, please be more specific:", :red
       say ""
       environments.each do |env_name, account_name, environment|
-        say "  heroku2ey #{tasks} --environment "; say "'#{env_name}' ", :yellow; 
+        say "  heroku2ey #{task} --environment "; say "'#{env_name}' ", :yellow; 
           say "--account "; say "'#{account_name}'", :yellow
       end
     end
