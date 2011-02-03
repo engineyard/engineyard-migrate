@@ -8,10 +8,17 @@ end
 Given /^I clone the application "([^"]*)" as "([^"]*)"$/ do |git_uri, app_name|
   @git_uri  = git_uri
   @app_name = app_name
-  @stdout = File.expand_path(File.join(@tmp_root, "git.out"))
-  @stderr = File.expand_path(File.join(@tmp_root, "git.err"))
+  repo_folder = File.expand_path(File.join(@repos_path, app_name))
+  unless File.exists?(repo_folder)
+    @stdout = File.expand_path(File.join(@tmp_root, "git.out"))
+    @stderr = File.expand_path(File.join(@tmp_root, "git.err"))
+    FileUtils.chdir(@repos_path) do
+      system "git clone #{git_uri} #{app_name} > #{@stdout.inspect} 2> #{@stderr.inspect}"
+    end
+  end
   in_home_folder do
-    system "git clone #{git_uri} #{app_name} > #{@stdout.inspect} 2> #{@stderr.inspect}"
+    FileUtils.rm_rf(app_name)
+    FileUtils.cp_r(repo_folder, app_name)
   end
   @active_project_folder = File.join(@home_path, app_name)
   @project_name = app_name
