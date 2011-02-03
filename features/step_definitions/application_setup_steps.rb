@@ -27,8 +27,14 @@ Given /^it has "([^"]*)" production data$/ do |data_source|
   @data_source = data_source
 end
 
-Given /^the source is hosted at "([^"]*)"$/ do |git_uri|
-  @git_uri = git_uri
+Given /^I clone the application "([^"]*)" as "([^"]*)"$/ do |git_uri, app_name|
+  @git_uri  = git_uri
+  @app_name = app_name
+  @stdout = File.expand_path(File.join(@tmp_root, "git.out"))
+  @stderr = File.expand_path(File.join(@tmp_root, "git.err"))
+  in_home_folder do
+    system "git clone #{git_uri} #{app_name} > #{@stdout.inspect} 2> #{@stderr.inspect}"
+  end
 end
 
 Given /^I have setup my AppCloud credentials$/ do
