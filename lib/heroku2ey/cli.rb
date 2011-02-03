@@ -15,7 +15,7 @@ module Heroku2EY
       if environments.size == 0
         no_environments_discovered and return
       elsif environments.size > 1
-        too_many_environments_discovered(environments) and return
+        too_many_environments_discovered("migrate", environments) and return
       end
       
       env_name, account_name, environment = environments.first
@@ -38,5 +38,22 @@ module Heroku2EY
       shell.say "ERROR: #{text}", :red
       exit
     end
+
+    def no_environments_discovered
+      say "No AppCloud environments found for this application.", :red
+      say "Either:"
+      say "  * Create an AppCloud environment for this application/git URL"
+      say "  * Use --environment/--account flags to select an AppCloud environment"
+    end
+    
+    def too_many_environments_discovered(task, environments)
+      say "Multiple environments possible, please be more specific:", :red
+      say ""
+      environments.each do |env_name, account_name, environment|
+        say "  heroku2ey #{tasks} --environment "; say "'#{env_name}' ", :yellow; 
+          say "--account "; say "'#{account_name}'", :yellow
+      end
+    end
+    
   end
 end

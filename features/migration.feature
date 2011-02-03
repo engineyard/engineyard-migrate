@@ -10,7 +10,7 @@ Feature: Migration
     And I have a Heroku application "heroku2ey-simple-app"
     And it has "heroku2ey-simple-app" production data
     And I have setup my AppCloud credentials
-    And I have an AppCloud account "heroku2ey" with environment "heroku2ey-simple-app-production"
+    And I have an AppCloud account "heroku2ey" with environment "heroku2eysimpleapp_production"
     When I run local executable "heroku2ey" with arguments "migrate . --account heroku2ey --environment heroku2ey-simple-app-production"
     Then I should see "Migration complete!"
     When I visit the AppCloud application
