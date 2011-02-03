@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+$:.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+require 'heroku2ey'
+require 'heroku2ey/cli'
+
+Heroku2EY::CLI.start

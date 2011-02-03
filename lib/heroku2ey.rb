@@ -1,3 +1,3 @@
-module Heroku2ey
+module Heroku2EY
   # Your code goes here...
 end

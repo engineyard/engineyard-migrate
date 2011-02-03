@@ -4,7 +4,7 @@ require "heroku2ey/version"
 
 Gem::Specification.new do |s|
   s.name        = "heroku2ey"
-  s.version     = Heroku2ey::VERSION
+  s.version     = Heroku2EY::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Dr Nic Williams", "Danish Khan"]
   s.email       = ["drnicwilliams@gmail.com"]
@@ -19,7 +19,10 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
+  s.add_dependency("engineyard", ["~> 1.3.14"])
+  s.add_dependency("heroku", ["~> 1.17.10"])
+
   s.add_development_dependency("rake", ["~> 0.8.7"])
-  s.add_development_dependency("cucumber", ["~> 0.9.4"])
+  s.add_development_dependency("cucumber", ["~> 0.10.0"])
   s.add_development_dependency("rspec", ["~> 2.2.0"])
 end
