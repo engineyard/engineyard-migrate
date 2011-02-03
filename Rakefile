@@ -19,3 +19,6 @@ end
 
 desc 'Alias for cucumber:ok'
 task :cucumber => 'cucumber:ok'
+
+desc "Start test server; Run cucumber:ok; Kill Test Server;"
+task :default => ["spec", "cucumber"]
