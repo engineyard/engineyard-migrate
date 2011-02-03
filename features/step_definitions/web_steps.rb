@@ -1,13 +1,5 @@
-When /^I visit the Heroku application$/ do
-  Net::HTTP.start(@heroku_host) do |http|
-    req = http.get("/")
-    @response_body = req.body
-  end
-end
-
-When /^I visit the AppCloud application$/ do
-  pending
-  Net::HTTP.start(@appcloud_host) do |http|
+When /^I visit the application at "([^"]*)"$/ do |host|
+  Net::HTTP.start(host) do |http|
     req = http.get("/")
     @response_body = req.body
   end

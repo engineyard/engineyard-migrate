@@ -10,7 +10,7 @@ Feature: Migration
     And I have setup my Heroku credentials
     And I have a Heroku application "heroku2ey-simple-app"
     And it has production data
-    When I visit the Heroku application
+    When I visit the application at "heroku2ey-simple-app.heroku.com"
     Then I should see table
       | People |
       | Dr Nic |
@@ -18,13 +18,13 @@ Feature: Migration
 
     And I have setup my AppCloud credentials
     And I have an AppCloud account "heroku2ey" with environment "heroku2eysimpleapp_production"
-    When I visit the AppCloud application
+    When I visit the application at "ec2-50-17-248-148.compute-1.amazonaws.com"
     Then I should see table
       | People |
 
     When I run local executable "heroku2ey" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see "Migration complete!"
-    When I visit the AppCloud application
+    When I visit the application at "ec2-50-17-248-148.compute-1.amazonaws.com"
     Then I should see table
       | People |
       | Dr Nic |
