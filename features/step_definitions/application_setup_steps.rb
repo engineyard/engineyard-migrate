@@ -5,6 +5,18 @@ Given /^I have setup my SSH keys$/ do
   end
 end
 
+Given /^I clone the application "([^"]*)" as "([^"]*)"$/ do |git_uri, app_name|
+  @git_uri  = git_uri
+  @app_name = app_name
+  @stdout = File.expand_path(File.join(@tmp_root, "git.out"))
+  @stderr = File.expand_path(File.join(@tmp_root, "git.err"))
+  in_home_folder do
+    system "git clone #{git_uri} #{app_name} > #{@stdout.inspect} 2> #{@stderr.inspect}"
+  end
+  @active_project_folder = File.join(@home_path, app_name)
+  @project_name = app_name
+end
+
 Given /^I have setup my Heroku credentials$/ do
   in_home_folder do
     FileUtils.cp_r(File.join(@fixtures_path, "credentials/heroku"), ".heroku")
@@ -21,20 +33,13 @@ end
 
 Given /^I have a Heroku application "([^"]*)"$/ do |name|
   @heroku_name = name
+  in_project_folder do
+    system "git remote add heroku git@heroku.com:#{name}.git"
+  end
 end
 
 Given /^it has "([^"]*)" production data$/ do |data_source|
   @data_source = data_source
-end
-
-Given /^I clone the application "([^"]*)" as "([^"]*)"$/ do |git_uri, app_name|
-  @git_uri  = git_uri
-  @app_name = app_name
-  @stdout = File.expand_path(File.join(@tmp_root, "git.out"))
-  @stderr = File.expand_path(File.join(@tmp_root, "git.err"))
-  in_home_folder do
-    system "git clone #{git_uri} #{app_name} > #{@stdout.inspect} 2> #{@stderr.inspect}"
-  end
 end
 
 Given /^I have setup my AppCloud credentials$/ do

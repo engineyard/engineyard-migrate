@@ -5,10 +5,10 @@ Feature: Migration
 
   Scenario: Migrate a simple app
     Given I have setup my SSH keys
+    And I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "app"
     And I have setup my Heroku credentials
     And I have a Heroku application "heroku2ey-simple-app"
     And it has "heroku2ey-simple-app" production data
-    And I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "app"
     And I have setup my AppCloud credentials
     And I have an AppCloud account "heroku2ey" with environment "heroku2ey-simple-app-production"
     When I run local executable "heroku2ey" with arguments "migrate . --account heroku2ey --environment heroku2ey-simple-app-production"
