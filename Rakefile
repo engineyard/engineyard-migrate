@@ -22,3 +22,10 @@ task :cucumber => 'cucumber:ok'
 
 desc "Start test server; Run cucumber:ok; Kill Test Server;"
 task :default => ["spec", "cucumber"]
+
+desc "Clean out cached git app repos"
+task :clean_app_repos do
+  repos_path = File.dirname(__FILE__) + "/fixtures/repos"
+  FileUtils.rm_rf(repos_path)
+  puts "Removed #{repos_path}..."
+end
