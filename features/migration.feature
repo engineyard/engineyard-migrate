@@ -4,7 +4,8 @@ Feature: Migration
   I want to migrate as much of my Heroku-hosted application to AppCloud
 
   Scenario: Migrate a simple app
-    Given I have setup my Heroku credentials
+    Given I have setup my SSH keys
+    And I have setup my Heroku credentials
     And I have a Heroku application "heroku2ey-simple-app"
     And it has "heroku2ey-simple-app" production data
     And the source is hosted at "git@github.com:engineyard/heroku2ey-simple-app.git"
