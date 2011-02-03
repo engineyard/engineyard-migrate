@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency("engineyard", ["~> 1.3.14"])
   s.add_dependency("heroku", ["~> 1.17.10"])
+  s.add_dependency("taps", ["~> 0.3.15"])
 
   s.add_development_dependency("rake", ["~> 0.8.7"])
   s.add_development_dependency("cucumber", ["~> 0.10.0"])

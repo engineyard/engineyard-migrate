@@ -22,6 +22,11 @@ Given /^I clone the application "([^"]*)" as "([^"]*)"$/ do |git_uri, app_name|
   end
   @active_project_folder = File.join(@home_path, app_name)
   @project_name = app_name
+  @stdout = File.expand_path(File.join(@tmp_root, "bundle.out"))
+  @stderr = File.expand_path(File.join(@tmp_root, "bundle.err"))
+  in_project_folder do
+    system "bundle > #{@stdout.inspect} 2> #{@stderr.inspect}"
+  end
 end
 
 Given /^I have setup my Heroku credentials$/ do
@@ -41,12 +46,30 @@ end
 Given /^I have a Heroku application "([^"]*)"$/ do |name|
   @heroku_name = name
   in_project_folder do
+    system "git remote rm heroku"
     system "git remote add heroku git@heroku.com:#{name}.git"
   end
 end
 
-Given /^it has "([^"]*)" production data$/ do |data_source|
-  @data_source = data_source
+Given /^it has production data$/ do
+  unless @production_data_installed
+    in_project_folder do
+      # TODO - currently hard coded into fixtures/data/APPNAME.sqlite3 as the commented code below isn't working
+      
+      # system %Q{rm -f db/development.sqlite3}
+      # `bundle exec rake db:migrate`
+      # %['Dr Nic', 'Danish'].each do |name|
+      #   system %Q{bundle exec rails runner "Person.create :name => '#{name}'"}
+      # end
+      data_file = File.expand_path(File.join(@fixtures_path, "data", "#{@app_name}.sqlite3"))
+      raise "Missing production data for '#{@app_name}' at #{data_file}; run 'rake db:seed' in fixtures/repos/#{app_name}" unless File.exists?(data_file)
+      FileUtils.cp_r(data_file, "db/development.sqlite3")
+      @stdout = File.expand_path(File.join(@tmp_root, "heroku.out"))
+      @stderr = File.expand_path(File.join(@tmp_root, "heroku.err"))
+      system "heroku db:push --confirm #{@heroku_name} > #{@stdout.inspect} 2> #{@stderr.inspect}"
+      @production_data_installed = true
+    end
+  end
 end
 
 Given /^I have setup my AppCloud credentials$/ do
