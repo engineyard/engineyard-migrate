@@ -47,7 +47,7 @@ Given /^I have a Heroku application "([^"]*)"$/ do |name|
   @heroku_name = name
   @heroku_host = "#{name}.heroku.com"
   in_project_folder do
-    system "git remote rm heroku"
+    system "git remote rm heroku 2> /dev/null"
     system "git remote add heroku git@heroku.com:#{name}.git"
   end
 end
