@@ -17,13 +17,45 @@ module Heroku2EY
     def migrate(path)
       error "Path '#{path}' does not exist" unless File.exists? path
       FileUtils.chdir(path) do
+        heroku_repo = `git config remote.heroku.url`.strip
+        if heroku_repo.empty?
+          error "'heroku2ey migrate #{path}' is for migrating heroku applications."
+        end
+
         app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
         # [EY::Model::App, EY::Model::Environment]
         say "account:       "; say "#{environment.account.name}", :green
         say "environment:   "; say "#{environment.name}", :green
         say "framework_env: "; say "#{environment.framework_env}", :green
         say "cluster size:  "; say "#{environment.instances_count}", :green
+        say "application:   "; say "#{app.name}", :yellow
+
+        @appcloud_app_name = app.name
+        
+        ssh_appcloud "git remote add heroku #{heroku_repo} 2> /dev/null"
+        
       end
+      
+      
+      # Do the following on the AppCloud instance:
+      # connection = Fog::Compute.new(
+      #   :provider => 'AWS',
+      #   :aws_access_key_id => XXX,
+      #   :aws_secret_access_key => YYY,
+      # )
+      # 
+      # # fill this in based on the name of the group, should be based on the environment name if I remember right
+      # security_group = connection.security_groups.get(SECURITY_GROUP_NAME)
+      # 
+      # security_group.authorize_port_range(5000..5000) # 3306 mysql; $PGPORT or 5432 for postgresql
+      # 
+      # heroku db:pull mysql://root:pass@myapplicationip/database
+      # 
+      # security_group.revoke_port_range(5000..5000)
+      
+      # To run commands:
+      
+      # ey ssh "echo `pwd`" --db-master
       
       say "Migration complete!", :green
     end
@@ -31,6 +63,12 @@ module Heroku2EY
     map "-v" => :version, "--version" => :version, "-h" => :help, "--help" => :help
 
     private
+    def ssh_appcloud(cmd, options = {})
+      path  = options[:path] || "/data/#{@appcloud_app_name}/current"
+      flags = options[:flags] || "--db-master"
+      system "ey ssh 'cd #{path}; #{cmd}' #{flags}"
+    end
+    
     def say(msg, color = nil)
       color ? shell.say(msg, color) : shell.say(msg)
     end

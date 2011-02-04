@@ -9,3 +9,7 @@ Then /^I should see table$/ do |table|
   doc_table = tableish('table#people tr', 'td,th')
   doc_table.should == table.raw
 end
+
+Then /^port "([^"]*)" on "([^"]*)" should be closed$/ do |port, host|
+  pending
+end

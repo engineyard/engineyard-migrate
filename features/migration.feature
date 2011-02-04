@@ -29,6 +29,7 @@ Feature: Migration
       | People |
       | Dr Nic |
       | Danish |
+    And port "3306" on "ec2-50-17-248-148.compute-1.amazonaws.com" should be closed
   
   
   
