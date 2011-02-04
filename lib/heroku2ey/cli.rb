@@ -44,8 +44,21 @@ module Heroku2EY
 
           say "Fetching AppCloud credentials..."; $stdout.flush
           dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json"
-          dna      = JSON.parse(dna_json)
-          dna_env  = dna["engineyard"]["environment"]
+          ap dna      = JSON.parse(dna_json)
+          ap dna_env  = dna["engineyard"]["environment"]
+
+          # TODO - to test for cron setup:
+          # dna_env["cron"] - list of:
+          # [0] {
+          #      "minute" => "0",
+          #        "name" => "rake cron",
+          #     "command" => "cd /data/heroku2eysimpleapp/current && RAILS_ENV=production rake cron",
+          #       "month" => "*",
+          #        "hour" => "1",
+          #         "day" => "*/1",
+          #        "user" => "deploy",
+          #     "weekday" => "*"
+          # }
       
           db_stack_name = dna_env["db_stack_name"]
           say "Database type: "; say db_stack_name, :green
@@ -55,18 +68,10 @@ module Heroku2EY
             :aws_access_key_id     => dna["aws_secret_id"],
             :aws_secret_access_key => dna["aws_secret_key"]
           )
-          ap security_group = connection.security_groups.last
-          # security_group = connection.security_groups.get(SECURITY_GROUP_NAME)
+          security_group = connection.security_groups.last
           security_group.revoke_port_range(3000..6000)
-          p security_group.authorize_port_range(3000..6000) # 3306 mysql; $PGPORT or 5432 for postgresql
+          security_group.authorize_port_range(3000..6000) # 3306 mysql; $PGPORT or 5432 for postgresql
 
-          connection = Fog::Compute.new(
-            :provider              => 'AWS',
-            :aws_access_key_id     => dna["aws_secret_id"],
-            :aws_secret_access_key => dna["aws_secret_key"]
-          )
-          ap security_group = connection.security_groups.last
-      
           say "Fetching AppCloud database credentials..."; $stdout.flush
           db_yml    = ssh_appcloud "cat /data/#{@appcloud_app_name}/shared/config/database.yml"
           db_config = YAML::load(db_yml)[environment.framework_env]
@@ -74,7 +79,7 @@ module Heroku2EY
       
           # only tested on solo
           db_host = dna_env["instances"].first["public_hostname"] if db_host == "localhost"
-      
+          # db_host = "50.17.248.148" - IPs might work better; if it worked at all
       
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@appcloud_app_name}'..."
           system "heroku db:pull mysql://#{db_user}:#{db_pass}@#{db_host}/#{db_database} --confirm #{heroku_app_name}"
