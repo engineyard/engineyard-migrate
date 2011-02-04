@@ -17,47 +17,78 @@ module Heroku2EY
     def migrate(path)
       error "Path '#{path}' does not exist" unless File.exists? path
       FileUtils.chdir(path) do
-        heroku_repo = `git config remote.heroku.url`.strip
-        if heroku_repo.empty?
-          error "'heroku2ey migrate #{path}' is for migrating heroku applications."
+        begin
+          heroku_repo = `git config remote.heroku.url`.strip
+          if heroku_repo.empty?
+            error "'heroku2ey migrate #{path}' is for migrating heroku applications."
+          end
+          heroku_repo =~ /git@heroku\.com:(.*)\.git/
+          heroku_app_name = $1
+          say "heroku app:    "; say heroku_app_name, :green
+          say ""
+
+          say "Requesting AppCloud account information..."; $stdout.flush
+          app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
+          @appcloud_app_name = app.name
+          say "account:       "; say "#{environment.account.name}", :green
+          say "environment:   "; say "#{environment.name}", :green
+          say "framework_env: "; say "#{environment.framework_env}", :green
+          say "cluster size:  "; say "#{environment.instances_count}", :green
+          say "application:   "; say "#{app.name}", :yellow
+          say ""
+      
+          require "json"
+          require "yaml"
+          require "fog"
+          require "ap"
+
+          say "Fetching AppCloud credentials..."; $stdout.flush
+          dna_json    = ssh_appcloud "sudo cat /etc/chef/dna.json"
+          dna         = JSON.parse(dna_json)
+          dna_env = dna["engineyard"]["environment"]
+      
+          db_stack_name = dna_env["db_stack_name"]
+          say "Database type: "; say db_stack_name, :green
+      
+          connection = Fog::Compute.new(
+            :provider              => 'AWS',
+            :aws_access_key_id     => dna["aws_secret_id"],
+            :aws_secret_access_key => dna["aws_secret_key"]
+          )
+          ap security_group = connection.security_groups.last
+          # security_group = connection.security_groups.get(SECURITY_GROUP_NAME)
+          security_group.revoke_port_range(3000..6000)
+          p security_group.authorize_port_range(3000..6000) # 3306 mysql; $PGPORT or 5432 for postgresql
+
+          connection = Fog::Compute.new(
+            :provider              => 'AWS',
+            :aws_access_key_id     => dna["aws_secret_id"],
+            :aws_secret_access_key => dna["aws_secret_key"]
+          )
+          ap security_group = connection.security_groups.last
+      
+          say "Fetching AppCloud database credentials..."; $stdout.flush
+          db_yml    = ssh_appcloud "cat database.yml", :path => "/data/#{@appcloud_app_name}/shared/config/"
+          db_config = YAML::load(db_yml)[environment.framework_env]
+          db_host, db_user, db_pass, db_database = db_config["host"], db_config["username"], db_config["password"], db_config["database"]
+      
+          # only tested on solo
+          db_host = dna_env["instances"].first["public_hostname"] if db_host == "localhost"
+      
+      
+          say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@appcloud_app_name}'..."
+          system "heroku db:pull mysql://#{db_user}:#{db_pass}@#{db_host}/#{db_database} --confirm #{heroku_app_name}"
+
+          # TODO - always do this
+      
+          say "Migration complete!", :green
+        rescue Exception => e
+          say "Migration failed", :error
+          puts e.backtrace
+        ensure
+          security_group.revoke_port_range(3000..6000)
         end
-
-        app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
-        # [EY::Model::App, EY::Model::Environment]
-        say "account:       "; say "#{environment.account.name}", :green
-        say "environment:   "; say "#{environment.name}", :green
-        say "framework_env: "; say "#{environment.framework_env}", :green
-        say "cluster size:  "; say "#{environment.instances_count}", :green
-        say "application:   "; say "#{app.name}", :yellow
-
-        @appcloud_app_name = app.name
-        
-        ssh_appcloud "git remote add heroku #{heroku_repo} 2> /dev/null"
-        
       end
-      
-      
-      # Do the following on the AppCloud instance:
-      # connection = Fog::Compute.new(
-      #   :provider => 'AWS',
-      #   :aws_access_key_id => XXX,
-      #   :aws_secret_access_key => YYY,
-      # )
-      # 
-      # # fill this in based on the name of the group, should be based on the environment name if I remember right
-      # security_group = connection.security_groups.get(SECURITY_GROUP_NAME)
-      # 
-      # security_group.authorize_port_range(5000..5000) # 3306 mysql; $PGPORT or 5432 for postgresql
-      # 
-      # heroku db:pull mysql://root:pass@myapplicationip/database
-      # 
-      # security_group.revoke_port_range(5000..5000)
-      
-      # To run commands:
-      
-      # ey ssh "echo `pwd`" --db-master
-      
-      say "Migration complete!", :green
     end
     
     map "-v" => :version, "--version" => :version, "-h" => :help, "--help" => :help
@@ -66,7 +97,7 @@ module Heroku2EY
     def ssh_appcloud(cmd, options = {})
       path  = options[:path] || "/data/#{@appcloud_app_name}/current"
       flags = options[:flags] || "--db-master"
-      system "ey ssh 'cd #{path}; #{cmd}' #{flags}"
+      `ey ssh 'cd #{path}; #{cmd}' #{flags}`
     end
     
     def say(msg, color = nil)
