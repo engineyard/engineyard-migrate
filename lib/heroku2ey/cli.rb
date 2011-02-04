@@ -43,9 +43,9 @@ module Heroku2EY
           require "ap"
 
           say "Fetching AppCloud credentials..."; $stdout.flush
-          dna_json    = ssh_appcloud "sudo cat /etc/chef/dna.json"
-          dna         = JSON.parse(dna_json)
-          dna_env = dna["engineyard"]["environment"]
+          dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json"
+          dna      = JSON.parse(dna_json)
+          dna_env  = dna["engineyard"]["environment"]
       
           db_stack_name = dna_env["db_stack_name"]
           say "Database type: "; say db_stack_name, :green
@@ -68,7 +68,7 @@ module Heroku2EY
           ap security_group = connection.security_groups.last
       
           say "Fetching AppCloud database credentials..."; $stdout.flush
-          db_yml    = ssh_appcloud "cat database.yml", :path => "/data/#{@appcloud_app_name}/shared/config/"
+          db_yml    = ssh_appcloud "cat /data/#{@appcloud_app_name}/shared/config/database.yml"
           db_config = YAML::load(db_yml)[environment.framework_env]
           db_host, db_user, db_pass, db_database = db_config["host"], db_config["username"], db_config["password"], db_config["database"]
       
