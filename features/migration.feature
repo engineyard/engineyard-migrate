@@ -17,7 +17,6 @@ Feature: Migration
       | Danish |
 
     Given I have setup my AppCloud credentials
-    Then I have an AppCloud account "heroku2ey" with environment "heroku2eysimpleapp_production"
     And I reset the AppCloud application "heroku2eysimpleapp" database
     When I visit the application at "ec2-50-17-248-148.compute-1.amazonaws.com"
     Then I should see table
@@ -73,3 +72,19 @@ Feature: Migration
       Please create, boot and deploy an AppCloud application for git@github.com:engineyard/heroku2ey-simple-app.git.
       """
   
+  Scenario: Fail if no AppCloud environments/applications match this application
+    Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
+    And I have a Heroku application "heroku2ey-simple-app"
+    And I have setup my SSH keys
+    And I have setup my Heroku credentials
+
+    Given I have setup my AppCloud credentials
+    And I run executable "git" with arguments "remote rm origin"
+    And I run executable "git" with arguments "remote add origin git@github.com:engineyard/UNKNOWN.git"
+    
+    When I run local executable "heroku2ey" with arguments "migrate ."
+    Then I should see
+      """
+      Please create, boot and deploy an AppCloud application for git@github.com:engineyard/UNKNOWN.git.
+      """
+

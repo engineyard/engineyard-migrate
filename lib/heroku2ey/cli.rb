@@ -44,6 +44,11 @@ module Heroku2EY
           
           say "Requesting AppCloud account information..."; $stdout.flush
           app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
+
+          unless app.repository_uri == repo
+            error "Please create, boot and deploy an AppCloud application for #{repo}."
+          end
+
           @appcloud_app_name = app.name
           say "account:       "; say "#{environment.account.name}", :green
           say "environment:   "; say "#{environment.name}", :green
