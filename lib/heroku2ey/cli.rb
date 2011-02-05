@@ -53,6 +53,9 @@ module Heroku2EY
           dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json", :return_output => true
           dna      = JSON.parse(dna_json)
           dna_env  = dna["engineyard"]["environment"]
+          
+          # TODO - what if no application deployed yet?
+          # bash: line 0: cd: /data/heroku2eysimpleapp/current: No such file or directory
 
           # TODO - to test for cron setup:
           # dna_env["cron"] - list of:
@@ -141,30 +144,26 @@ module Heroku2EY
 
     private
     def ssh_appcloud(cmd, options = {})
-      path  = options[:path] || "/data/#{@appcloud_app_name}/current"
-      flags = options[:flags] || "--db-master"
+      path  = options[:path] || "/data/#{@appcloud_app_name}/current/"
+      flags = options[:flags] || "" # app master by default
       ssh_cmd = "ey ssh 'cd #{path}; #{cmd}' #{flags}"
-      debug options[:return_output] ? "Capturing: " : "Running: "; say ssh_cmd, :yellow
+      debug options[:return_output] ? "Capturing: " : "Running: "
+      debug ssh_cmd, :yellow
       out = ""
       status =
-         POpen4::popen4(ssh_cmd) do |stdout, stderr, stdin, pid|
-           # stdin.puts "echo hello world!"
-           # stdin.puts "echo ERROR! 1>&2"
-           # stdin.puts "exit"
-           # stdin.close
-
-           # puts "pid        : #{ pid }"
-           if options[:return_output]
-             out += stdout.read.strip
-           else
-             out = stdout.read.strip
-             say out unless out.empty?
-           end
-           err = stderr.read.strip
-           say err unless err.empty?
-         end
-
+        POpen4::popen4(ssh_cmd) do |stdout, stderr, stdin, pid|
+          if options[:return_output]
+            out += stdout.read.strip
+          else
+            out = stdout.read.strip
+            say out unless out.empty?
+          end
+          err = stderr.read.strip
+          say err unless err.empty?
+        end
+        
        puts "exitstatus : #{ status.exitstatus }" unless status.exitstatus == 0
+       debug ""
        out if options[:return_output]
     end
     
