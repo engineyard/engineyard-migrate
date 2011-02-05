@@ -2,6 +2,8 @@
 
 **DO NOT OPEN SOURCE** until management of passwords/credentials for testing + CI is figured out and the codebase cleaned up + passwords possibly changed.
 
+## Workers
+
 ## Heroku Addons
 
 ### Database

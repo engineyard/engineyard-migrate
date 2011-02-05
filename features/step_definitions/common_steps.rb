@@ -44,9 +44,9 @@ When /^I run project executable "(.*)" with arguments "(.*)"/ do |executable, ar
 end
 
 When /^I run local executable "(.*)" with arguments "(.*)"/ do |executable, arguments|
-  if executable == "ey-hudson"
-    require 'engineyard-hudson'
-    require 'engineyard-hudson/cli'
+  if executable == "heroku2ey"
+    require 'heroku2ey'
+    require 'heroku2ey/cli'
     in_project_folder do
       stdout, stderr = capture_stdios do
         Heroku2EY::CLI.start(arguments.split(/ /))

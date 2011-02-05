@@ -16,8 +16,9 @@ Feature: Migration
       | Dr Nic |
       | Danish |
 
-    And I have setup my AppCloud credentials
-    And I have an AppCloud account "heroku2ey" with environment "heroku2eysimpleapp_production"
+    Given I have setup my AppCloud credentials
+    Then I have an AppCloud account "heroku2ey" with environment "heroku2eysimpleapp_production"
+    And I reset the AppCloud application "heroku2eysimpleapp" database
     When I visit the application at "ec2-50-17-248-148.compute-1.amazonaws.com"
     Then I should see table
       | People |

@@ -80,8 +80,14 @@ Given /^I have setup my AppCloud credentials$/ do
   end
 end
 
-Given /^I have an AppCloud account "([^"]*)" with environment "([^"]*)"$/ do |account, environment|
-  @appcloud_account, @appcloud_environment = account, environment
-  @appcloud_host = "google.com" # TODO
+Then /^I have an AppCloud account "([^"]*)" with environment "([^"]*)"$/ do |account, environment|
+  # TODO assert that this application is available to the user
 end
+
+Given /^I reset the AppCloud application "([^"]*)" database$/ do |app_name|
+  in_project_folder do
+    system "ey ssh 'cd /data/#{app_name}/current/; RAILS_ENV=production rake db:schema:load'"
+  end
+end
+
 
