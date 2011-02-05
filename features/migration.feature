@@ -40,5 +40,13 @@ Feature: Migration
       'heroku2ey migrate' is for migrating heroku applications.
       """
   
+  Scenario: Fail if Heroku credentials not available
+    Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
+    And I have a Heroku application "heroku2ey-simple-app"
+    When I run local executable "heroku2ey" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
+    Then I should see
+      """
+      Please setup your local Heroku credentials first.
+      """
   
   
