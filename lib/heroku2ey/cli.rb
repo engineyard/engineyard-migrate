@@ -20,19 +20,20 @@ module Heroku2EY
       error "Path '#{path}' does not exist" unless File.exists? path
       FileUtils.chdir(path) do
         begin
-          heroku_credentials = File.expand_path("~/.heroku/credentials")
-          unless File.exists?(heroku_credentials)
-            error "Please setup your local Heroku credentials first."
-          end
-
           heroku_repo = `git config remote.heroku.url`.strip
           if heroku_repo.empty?
-            error "'heroku2ey migrate #{path}' is for migrating heroku applications."
+            error "'heroku2ey migrate' is for migrating heroku applications."
           end
           heroku_repo =~ /git@heroku\.com:(.*)\.git/
           heroku_app_name = $1
           say "heroku app:    "; say heroku_app_name, :green
           say ""
+
+          heroku_credentials = File.expand_path("~/.heroku/credentials")
+          unless File.exists?(heroku_credentials)
+            error "Please setup your local Heroku credentials first."
+          end
+
 
           say "Requesting AppCloud account information..."; $stdout.flush
           app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
@@ -100,43 +101,26 @@ module Heroku2EY
           db_host_user = 'deploy'
           
           debug "Uploding Heroku credential file..."
-          begin
-            Net::SFTP.start(db_host, db_host_user) do |sftp|
-               sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
-            end
-          rescue Net::SFTP::StatusException => e
-            error e.description + ": " + e.text
+          Net::SFTP.start(db_host, db_host_user) do |sftp|
+             sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
           end
-          # add ssh keys to heroku
           
           ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
           ssh_appcloud "git remote add heroku git@heroku.com:heroku2ey-simple-app.git 2> /dev/null"
 
-          # This wasn't working from my [drnic's] home network; so moving to 
-          # say "Fetching AppCloud database credentials..."; $stdout.flush
-          # db_yml    = ssh_appcloud "cat /data/#{@appcloud_app_name}/shared/config/database.yml"
-          # db_config = YAML::load(db_yml)[environment.framework_env]
-          # db_host, db_user, db_pass, db_database = db_config["host"], db_config["username"], db_config["password"], db_config["database"]
-          #       
-          # # only tested on solo
-          # db_host = dna_env["instances"].first["public_hostname"] if db_host == "localhost"
-          # db_host = "50.17.248.148" # IPs might work better; if it worked at all
-      
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@appcloud_app_name}'..."
           env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{environment.framework_env}" }.join(" ")
           ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name}"
 
           say "Migration complete!", :green
+        rescue SystemExit
+        rescue Net::SFTP::StatusException => e
+          error e.description + ": " + e.text
         rescue Exception => e
           say "Migration failed", :red
           puts e.inspect
           puts e.backtrace
-        ensure
-          # security_group.revoke_port_range(3000..6000)
         end
-        
-        # or 
-        
       end
     end
     
