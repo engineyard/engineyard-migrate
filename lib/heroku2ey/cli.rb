@@ -90,34 +90,19 @@ module Heroku2EY
           db_stack_name = dna_env["db_stack_name"]
           say "Database type: "; say db_stack_name, :green
       
-          connection = Fog::Compute.new(
-            :provider              => 'AWS',
-            :aws_access_key_id     => dna["aws_secret_id"],
-            :aws_secret_access_key => dna["aws_secret_key"]
-          )
-          security_group = connection.security_groups.first
-          # security_group.revoke_port_range(3000..6000)
-          # security_group.authorize_port_range(3000..6000) # 3306 mysql; $PGPORT or 5432 for postgresql
-          # Fog.wait_for do
-          #   security_group.reload.ip_permissions.detect do |ip_permission|
-          #     ip_permission['ipRanges'].first && ip_permission['ipRanges'].first['cidrIp'] == '0.0.0.0/0' &&
-          #     ip_permission['ipProtocol'] == 'tcp' &&
-          #     ip_permission['fromPort'] == 3000 &&
-          #     ip_permission['toPort'] == 6000
-          #   end
-          # end
-          
           say "Setting up Heroku credentials on AppCloud..."
 
           # setup ~/.heroku/credentials
           ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => "~"
           home_path = ssh_appcloud "pwd", :path => "~", :return_output => true
           
-          db_host = dna_env['instances'].first['public_hostname'] # which is DB instance?
-          db_host_user = 'deploy'
+          # TODO get host URL from ey gem; then we don't need dna.json access
+          
+          app_host      = dna_env['instances'].first['public_hostname'] # which is DB instance?
+          app_host_user = 'deploy' # TODO might not be
           
           debug "Uploding Heroku credential file..."
-          Net::SFTP.start(db_host, db_host_user) do |sftp|
+          Net::SFTP.start(app_host, app_host_user) do |sftp|
              sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
           end
           
