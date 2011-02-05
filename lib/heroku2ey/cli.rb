@@ -7,6 +7,7 @@ require 'engineyard/thor'
 require "engineyard/cli"
 require "engineyard/cli/ui"
 require "engineyard/error"
+require "ap"
 
 module Heroku2EY
   class CLI < Thor
@@ -26,7 +27,10 @@ module Heroku2EY
           end
           heroku_repo =~ /git@heroku\.com:(.*)\.git/
           heroku_app_name = $1
+
+          say "Requesting Heroku account information..."; $stdout.flush
           say "Heroku app:    "; say heroku_app_name, :green
+          system "heroku info"
           say ""
 
           heroku_credentials = File.expand_path("~/.heroku/credentials")
@@ -54,26 +58,17 @@ module Heroku2EY
           end
 
           @appcloud_app_name = app.name
+          app_master_host = environment.app_master.public_hostname
+          app_master_user = environment.username
+
           say "AppCloud app:  "; say "#{app.name}", :green
           say "AppCloud acct: "; say "#{environment.account.name}", :yellow
           say "Environment:   "; say "#{environment.name}", :yellow
-          say "framework_env: "; say "#{environment.framework_env}", :yellow
-          say "cluster size:  "; say "#{environment.instances_count}", :yellow
+          say "RACK_ENV:      "; say "#{environment.framework_env}", :yellow
+          say "Cluster size:  "; say "#{environment.instances_count}", :yellow
+          say "Hostname:      "; say "#{app_master_host}", :yellow
           say ""
       
-          require "json"
-          require "yaml"
-          require "fog"
-          require "ap"
-          # 
-          # ap app
-          # ap environment
-
-          say "Fetching AppCloud credentials..."; $stdout.flush
-          dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json", :return_output => true
-          dna      = JSON.parse(dna_json)
-          dna_env  = dna["engineyard"]["environment"]
-          
           # TODO - what if no application deployed yet?
           # bash: line 0: cd: /data/heroku2eysimpleapp/current: No such file or directory
 
@@ -90,22 +85,14 @@ module Heroku2EY
           #     "weekday" => "*"
           # }
       
-          db_stack_name = dna_env["db_stack_name"]
-          say "Database type: "; say db_stack_name, :green
-      
           say "Setting up Heroku credentials on AppCloud..."
 
           # setup ~/.heroku/credentials
           ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => "~"
           home_path = ssh_appcloud "pwd", :path => "~", :return_output => true
           
-          # TODO get host URL from ey gem; then we don't need dna.json access
-          
-          app_host      = dna_env['instances'].first['public_hostname'] # which is DB instance?
-          app_host_user = 'deploy' # TODO might not be
-          
           debug "Uploading Heroku credential file..."
-          Net::SFTP.start(app_host, app_host_user) do |sftp|
+          Net::SFTP.start(app_master_host, app_master_user) do |sftp|
              sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
           end
           
