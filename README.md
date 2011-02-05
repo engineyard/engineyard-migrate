@@ -4,6 +4,8 @@
 
 ## Workers
 
+Heroku documentation on their workers/background jobs - [http://devcenter.heroku.com/articles/delayed-job](http://devcenter.heroku.com/articles/delayed-job)
+
 ## Heroku Addons
 
 ### Database
