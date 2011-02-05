@@ -26,7 +26,7 @@ module Heroku2EY
           end
           heroku_repo =~ /git@heroku\.com:(.*)\.git/
           heroku_app_name = $1
-          say "heroku app:    "; say heroku_app_name, :green
+          say "Heroku app:    "; say heroku_app_name, :green
           say ""
 
           heroku_credentials = File.expand_path("~/.heroku/credentials")
@@ -54,17 +54,20 @@ module Heroku2EY
           end
 
           @appcloud_app_name = app.name
-          say "account:       "; say "#{environment.account.name}", :green
-          say "environment:   "; say "#{environment.name}", :green
-          say "framework_env: "; say "#{environment.framework_env}", :green
-          say "cluster size:  "; say "#{environment.instances_count}", :green
-          say "application:   "; say "#{app.name}", :yellow
+          say "AppCloud app:  "; say "#{app.name}", :green
+          say "AppCloud acct: "; say "#{environment.account.name}", :yellow
+          say "Environment:   "; say "#{environment.name}", :yellow
+          say "framework_env: "; say "#{environment.framework_env}", :yellow
+          say "cluster size:  "; say "#{environment.instances_count}", :yellow
           say ""
       
           require "json"
           require "yaml"
           require "fog"
           require "ap"
+          # 
+          # ap app
+          # ap environment
 
           say "Fetching AppCloud credentials..."; $stdout.flush
           dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json", :return_output => true
