@@ -1,6 +1,8 @@
 require 'thor'
 require 'net/http'
 require 'uri'
+require 'POpen4'
+require 'net/sftp'
 require 'engineyard/thor'
 require "engineyard/cli"
 require "engineyard/cli/ui"
@@ -18,6 +20,11 @@ module Heroku2EY
       error "Path '#{path}' does not exist" unless File.exists? path
       FileUtils.chdir(path) do
         begin
+          heroku_credentials = File.expand_path("~/.heroku/credentials")
+          unless File.exists?(heroku_credentials)
+            error "Please setup your local Heroku credentials first."
+          end
+
           heroku_repo = `git config remote.heroku.url`.strip
           if heroku_repo.empty?
             error "'heroku2ey migrate #{path}' is for migrating heroku applications."
@@ -44,8 +51,8 @@ module Heroku2EY
 
           say "Fetching AppCloud credentials..."; $stdout.flush
           dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json"
-          ap dna      = JSON.parse(dna_json)
-          ap dna_env  = dna["engineyard"]["environment"]
+          dna      = JSON.parse(dna_json)
+          dna_env  = dna["engineyard"]["environment"]
 
           # TODO - to test for cron setup:
           # dna_env["cron"] - list of:
@@ -68,31 +75,63 @@ module Heroku2EY
             :aws_access_key_id     => dna["aws_secret_id"],
             :aws_secret_access_key => dna["aws_secret_key"]
           )
-          security_group = connection.security_groups.last
-          security_group.revoke_port_range(3000..6000)
-          security_group.authorize_port_range(3000..6000) # 3306 mysql; $PGPORT or 5432 for postgresql
+          security_group = connection.security_groups.first
+          # security_group.revoke_port_range(3000..6000)
+          # security_group.authorize_port_range(3000..6000) # 3306 mysql; $PGPORT or 5432 for postgresql
+          # Fog.wait_for do
+          #   security_group.reload.ip_permissions.detect do |ip_permission|
+          #     ip_permission['ipRanges'].first && ip_permission['ipRanges'].first['cidrIp'] == '0.0.0.0/0' &&
+          #     ip_permission['ipProtocol'] == 'tcp' &&
+          #     ip_permission['fromPort'] == 3000 &&
+          #     ip_permission['toPort'] == 6000
+          #   end
+          # end
+          
+          say "Setting up Heroku credentials on AppCloud..."
 
-          say "Fetching AppCloud database credentials..."; $stdout.flush
-          db_yml    = ssh_appcloud "cat /data/#{@appcloud_app_name}/shared/config/database.yml"
-          db_config = YAML::load(db_yml)[environment.framework_env]
-          db_host, db_user, db_pass, db_database = db_config["host"], db_config["username"], db_config["password"], db_config["database"]
-      
-          # only tested on solo
-          db_host = dna_env["instances"].first["public_hostname"] if db_host == "localhost"
-          # db_host = "50.17.248.148" - IPs might work better; if it worked at all
+          # setup ~/.heroku/credentials
+          ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => "~"
+          home_path = ssh_appcloud "pwd", :path => "~"
+          
+          ap dna
+          db_host = dna_env['instances'].first['public_hostname'] # which is DB instance?
+          db_host_user = 'deploy'
+          begin
+            Net::SFTP.start(db_host, db_host_user) do |sftp|
+               sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
+            end
+          rescue Net::SFTP::StatusException => e
+            error e.description + ": " + e.text
+          end
+          # add ssh keys to heroku
+          
+          ssh_appcloud "sudo gem install heroku taps"
+          ssh_appcloud "git remote add heroku git@heroku.com:heroku2ey-simple-app.git 2> /dev/null"
+
+          # This wasn't working from my [drnic's] home network; so moving to 
+          # say "Fetching AppCloud database credentials..."; $stdout.flush
+          # db_yml    = ssh_appcloud "cat /data/#{@appcloud_app_name}/shared/config/database.yml"
+          # db_config = YAML::load(db_yml)[environment.framework_env]
+          # db_host, db_user, db_pass, db_database = db_config["host"], db_config["username"], db_config["password"], db_config["database"]
+          #       
+          # # only tested on solo
+          # db_host = dna_env["instances"].first["public_hostname"] if db_host == "localhost"
+          # db_host = "50.17.248.148" # IPs might work better; if it worked at all
       
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@appcloud_app_name}'..."
-          system "heroku db:pull mysql://#{db_user}:#{db_pass}@#{db_host}/#{db_database} --confirm #{heroku_app_name}"
+          ssh_appcloud "RAILS_ENV=#{environment.framework_env} heroku db:pull --confirm #{heroku_app_name}"
 
-          # TODO - always do this
-      
           say "Migration complete!", :green
         rescue Exception => e
-          say "Migration failed", :error
+          say "Migration failed", :red
+          puts e.inspect
           puts e.backtrace
         ensure
-          security_group.revoke_port_range(3000..6000)
+          # security_group.revoke_port_range(3000..6000)
         end
+        
+        # or 
+        
       end
     end
     
@@ -102,7 +141,24 @@ module Heroku2EY
     def ssh_appcloud(cmd, options = {})
       path  = options[:path] || "/data/#{@appcloud_app_name}/current"
       flags = options[:flags] || "--db-master"
-      `ey ssh 'cd #{path}; #{cmd}' #{flags}`
+      ssh_cmd = "ey ssh 'cd #{path}; #{cmd}' #{flags}"
+      say "Running: "; say ssh_cmd, :yellow
+      out = ""
+      status =
+         POpen4::popen4(ssh_cmd) do |stdout, stderr, stdin, pid|
+           # stdin.puts "echo hello world!"
+           # stdin.puts "echo ERROR! 1>&2"
+           # stdin.puts "exit"
+           # stdin.close
+
+           # puts "pid        : #{ pid }"
+           out += stdout.read.strip
+           say stderr.read.strip, :red
+         end
+
+       puts "status     : #{ status.inspect }"
+       puts "exitstatus : #{ status.exitstatus }"
+       out
     end
     
     def say(msg, color = nil)
