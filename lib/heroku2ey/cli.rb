@@ -145,8 +145,8 @@ module Heroku2EY
     private
     def ssh_appcloud(cmd, options = {})
       path  = options[:path] || "/data/#{@appcloud_app_name}/current/"
-      flags = options[:flags] || "" # app master by default
-      ssh_cmd = "ey ssh 'cd #{path}; #{cmd}' #{flags}"
+      flags = " #{options[:flags]}" || "" if options[:flags] # app master by default
+      ssh_cmd = "ey ssh 'cd #{path}; #{cmd}'#{flags}"
       debug options[:return_output] ? "Capturing: " : "Running: "
       debug ssh_cmd, :yellow
       out = ""
@@ -163,7 +163,6 @@ module Heroku2EY
         end
         
        puts "exitstatus : #{ status.exitstatus }" unless status.exitstatus == 0
-       debug ""
        out if options[:return_output]
     end
     
