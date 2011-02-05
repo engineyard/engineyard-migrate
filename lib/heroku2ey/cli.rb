@@ -50,7 +50,7 @@ module Heroku2EY
           require "ap"
 
           say "Fetching AppCloud credentials..."; $stdout.flush
-          dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json"
+          dna_json = ssh_appcloud "sudo cat /etc/chef/dna.json", :return_output => true
           dna      = JSON.parse(dna_json)
           dna_env  = dna["engineyard"]["environment"]
 
@@ -91,11 +91,12 @@ module Heroku2EY
 
           # setup ~/.heroku/credentials
           ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => "~"
-          home_path = ssh_appcloud "pwd", :path => "~"
+          home_path = ssh_appcloud "pwd", :path => "~", :return_output => true
           
-          ap dna
           db_host = dna_env['instances'].first['public_hostname'] # which is DB instance?
           db_host_user = 'deploy'
+          
+          debug "Uploding Heroku credential file..."
           begin
             Net::SFTP.start(db_host, db_host_user) do |sftp|
                sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
@@ -119,7 +120,8 @@ module Heroku2EY
           # db_host = "50.17.248.148" # IPs might work better; if it worked at all
       
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@appcloud_app_name}'..."
-          ssh_appcloud "RAILS_ENV=#{environment.framework_env} heroku db:pull --confirm #{heroku_app_name}"
+          env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{environment.framework_env}" }.join(" ")
+          ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name}"
 
           say "Migration complete!", :green
         rescue Exception => e
@@ -142,7 +144,7 @@ module Heroku2EY
       path  = options[:path] || "/data/#{@appcloud_app_name}/current"
       flags = options[:flags] || "--db-master"
       ssh_cmd = "ey ssh 'cd #{path}; #{cmd}' #{flags}"
-      say "Running: "; say ssh_cmd, :yellow
+      debug options[:return_output] ? "Capturing: " : "Running: "; say ssh_cmd, :yellow
       out = ""
       status =
          POpen4::popen4(ssh_cmd) do |stdout, stderr, stdin, pid|
@@ -152,17 +154,26 @@ module Heroku2EY
            # stdin.close
 
            # puts "pid        : #{ pid }"
-           out += stdout.read.strip
-           say stderr.read.strip, :red
+           if options[:return_output]
+             out += stdout.read.strip
+           else
+             out = stdout.read.strip
+             say out unless out.empty?
+           end
+           err = stderr.read.strip
+           say err unless err.empty?
          end
 
-       puts "status     : #{ status.inspect }"
-       puts "exitstatus : #{ status.exitstatus }"
-       out
+       puts "exitstatus : #{ status.exitstatus }" unless status.exitstatus == 0
+       out if options[:return_output]
     end
     
     def say(msg, color = nil)
       color ? shell.say(msg, color) : shell.say(msg)
+    end
+    
+    def debug(msg, color = nil)
+      say(msg, color)
     end
 
     def display(text)
