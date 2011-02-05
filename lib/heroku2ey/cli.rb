@@ -36,7 +36,11 @@ module Heroku2EY
           
           repo = `git config remote.origin.url`.strip
           if repo.empty?
-            error "Please host your Git repo externally and add as remote 'origin'."
+            error "Please host your Git repo externally and add as remote 'origin'.", <<-SUGGESTION.gsub(/^\s{12}/, '')
+            You can create a GitHub repository using 'github' gem:
+              $ gem install github
+              $ gh create-from-local --private
+            SUGGESTION
           end
           unless EY::API.read_token
             error "Please create, boot and deploy an AppCloud application for #{repo}."
@@ -175,8 +179,12 @@ module Heroku2EY
       exit
     end
 
-    def error(text)
+    def error(text, suggestion = nil)
       shell.say "ERROR: #{text}", :red
+      if suggestion
+        shell.say ""
+        shell.say suggestion
+      end
       exit
     end
 
