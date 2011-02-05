@@ -22,7 +22,7 @@ module Heroku2EY
         begin
           heroku_repo = `git config remote.heroku.url`.strip
           if heroku_repo.empty?
-            error "'heroku2ey migrate' is for migrating heroku applications."
+            error "'heroku2ey migrate' is for migrating SalesForce Heroku applications to Engine Yard AppCloud."
           end
           heroku_repo =~ /git@heroku\.com:(.*)\.git/
           heroku_app_name = $1
@@ -31,10 +31,17 @@ module Heroku2EY
 
           heroku_credentials = File.expand_path("~/.heroku/credentials")
           unless File.exists?(heroku_credentials)
-            error "Please setup your local Heroku credentials first."
+            error "Please setup your Salesforce Heroku credentials first."
           end
-
-
+          
+          repo = `git config remote.origin.url`.strip
+          if repo.empty?
+            error "Please host your Git repo externally and add as remote 'origin'."
+          end
+          unless EY::API.read_token
+            error "Please create, boot and deploy an AppCloud application for #{repo}."
+          end
+          
           say "Requesting AppCloud account information..."; $stdout.flush
           app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
           @appcloud_app_name = app.name
