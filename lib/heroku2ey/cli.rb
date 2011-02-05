@@ -22,7 +22,7 @@ module Heroku2EY
         begin
           heroku_repo = `git config remote.heroku.url`.strip
           if heroku_repo.empty?
-            error "'heroku2ey migrate' is for migrating SalesForce Heroku applications to Engine Yard AppCloud."
+            error "Not a Salesforce Heroku application."
           end
           heroku_repo =~ /git@heroku\.com:(.*)\.git/
           heroku_app_name = $1
@@ -101,7 +101,7 @@ module Heroku2EY
           app_host      = dna_env['instances'].first['public_hostname'] # which is DB instance?
           app_host_user = 'deploy' # TODO might not be
           
-          debug "Uploding Heroku credential file..."
+          debug "Uploading Heroku credential file..."
           Net::SFTP.start(app_host, app_host_user) do |sftp|
              sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
           end

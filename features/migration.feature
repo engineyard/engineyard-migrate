@@ -36,7 +36,7 @@ Feature: Migration
     When I run local executable "heroku2ey" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see
       """
-      'heroku2ey migrate' is for migrating heroku applications.
+      Not a Salesforce Heroku application.
       """
   
   Scenario: Fail if Heroku credentials not available
