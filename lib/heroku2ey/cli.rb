@@ -109,7 +109,7 @@ module Heroku2EY
           end
           # add ssh keys to heroku
           
-          ssh_appcloud "sudo gem install heroku taps"
+          ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
           ssh_appcloud "git remote add heroku git@heroku.com:heroku2ey-simple-app.git 2> /dev/null"
 
           # This wasn't working from my [drnic's] home network; so moving to 
