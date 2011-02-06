@@ -49,7 +49,10 @@ When /^I run local executable "(.*)" with arguments "(.*)"/ do |executable, argu
     require 'heroku2ey/cli'
     in_project_folder do
       stdout, stderr = capture_stdios do
-        Heroku2EY::CLI.start(arguments.split(/ /))
+        begin
+          Heroku2EY::CLI.start(arguments.split(/ /))
+        rescue SystemExit
+        end
       end
       @stdout = File.expand_path(File.join(@tmp_root, "executable.out"))
       File.open(@stdout, "w") {|f| f << stdout; f << stderr}
