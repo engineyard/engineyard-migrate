@@ -57,11 +57,13 @@ Given /^it has production data$/ do
     in_project_folder do
       # TODO - currently hard coded into fixtures/data/APPNAME.sqlite3 as the commented code below isn't working
       
-      # system %Q{rm -f db/development.sqlite3}
-      # `bundle exec rake db:migrate`
-      # %['Dr Nic', 'Danish'].each do |name|
-      #   system %Q{bundle exec rails runner "Person.create :name => '#{name}'"}
-      # end
+      `rm -f db/development.sqlite3`
+      `bundle exec rake db:schema:load`
+      cmds = ['Dr Nic', 'Danish'].map do |name|
+        "Person.create(:name => '#{name}')"
+      end.join("; ")
+      `bundle exec rails runner "#{cmds}"`
+      
       data_file = File.expand_path(File.join(@fixtures_path, "data", "#{@app_name}.sqlite3"))
       raise "Missing production data for '#{@app_name}' at #{data_file}; run 'rake db:seed' in fixtures/repos/#{app_name}" unless File.exists?(data_file)
       FileUtils.cp_r(data_file, "db/development.sqlite3")
