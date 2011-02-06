@@ -29,7 +29,6 @@ Feature: Migration
       | People |
       | Dr Nic |
       | Danish |
-    And port "3306" on "ec2-50-17-248-148.compute-1.amazonaws.com" should be closed
   
   Scenario: Fail if application isn't on Heroku
     Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
