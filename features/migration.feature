@@ -44,7 +44,7 @@ Feature: Migration
     When I run local executable "heroku2ey" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see
       """
-      Please setup your local Heroku credentials first.
+      Please setup your Salesforce Heroku credentials first.
       """
   
   Scenario: Fail if no Git 'origin' repo URI
