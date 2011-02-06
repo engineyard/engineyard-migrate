@@ -89,12 +89,13 @@ module Heroku2EY
           say "Setting up Heroku credentials on AppCloud..."
 
           # setup ~/.heroku/credentials
-          ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => "~"
           home_path = ssh_appcloud "pwd", :path => "~", :return_output => true
+          say "AppCloud $HOME: "; say home_path, :yellow
+          ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => home_path
           
           debug "Uploading Heroku credential file..."
           Net::SFTP.start(app_master_host, app_master_user) do |sftp|
-             sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
+            sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
           end
           
           ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
@@ -124,7 +125,7 @@ module Heroku2EY
       flags = " #{options[:flags]}" || "" if options[:flags] # app master by default
       ssh_cmd = "ey ssh 'cd #{path}; #{cmd}'#{flags}"
       debug options[:return_output] ? "Capturing: " : "Running: "
-      debug ssh_cmd, :yellow
+      debug ssh_cmd, :yellow; $stdout.flush
       out = ""
       status =
         POpen4::popen4(ssh_cmd) do |stdout, stderr, stdin, pid|
