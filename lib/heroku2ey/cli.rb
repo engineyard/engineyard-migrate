@@ -107,6 +107,8 @@ module Heroku2EY
 
           say "Migration complete!", :green
         rescue SystemExit
+        rescue Net::SSH::AuthenticationFailed => e
+          error "Please setup your SSH credentials for AppCloud."
         rescue Net::SFTP::StatusException => e
           error e.description + ": " + e.text
         rescue Exception => e
