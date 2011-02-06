@@ -30,13 +30,14 @@ module Heroku2EY
 
           say "Requesting Heroku account information..."; $stdout.flush
           say "Heroku app:    "; say heroku_app_name, :green
-          system "heroku info"
-          say ""
 
           heroku_credentials = File.expand_path("~/.heroku/credentials")
           unless File.exists?(heroku_credentials)
             error "Please setup your Salesforce Heroku credentials first."
           end
+
+          say `heroku info`
+          say ""
           
           repo = `git config remote.origin.url`.strip
           if repo.empty?
