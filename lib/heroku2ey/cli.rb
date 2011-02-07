@@ -53,25 +53,25 @@ module Heroku2EY
           end
           
           say "Requesting AppCloud account information..."; $stdout.flush
-          app, environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
+          @app, @environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
 
-          unless app.repository_uri == repo
+          unless @app.repository_uri == repo
             error "Please create, boot and deploy an AppCloud application for #{repo}."
           end
-          unless environment.app_master
+          unless @environment.app_master
             error "Please boot your AppCloud environment and then deploy your application."
           end
 
-          @appcloud_app_name = app.name
-          app_master_host = environment.app_master.public_hostname
-          app_master_user = environment.username
+          @app.name = @app.name
+          app_master_host = @environment.app_master.public_hostname
+          app_master_user = @environment.username
 
-          say   "Application:    "; say   "#{app.name}", :green
-          say   "Account:        "; say   "#{environment.account.name}", :yellow
-          say   "Environment:    "; say   "#{environment.name}", :yellow
-          say   "Cluster size:   "; say   "#{environment.instances_count}", :yellow
-          say   "Hostname:       "; say   "#{app_master_host}", :yellow
-          debug "$RACK_ENV:      "; debug "#{environment.framework_env}", :yellow
+          say   "Application:    "; say   "#{@app.name}", :green
+          say   "Account:        "; say   "#{@environment.account.name}", :yellow
+          say   "Environment:    "; say   "#{@environment.name}", :yellow
+          say   "Cluster size:   "; say   "#{@environment.instances_count}", :yellow
+          say   "Hostname:       "; say   "#{@app_master_host}", :yellow
+          debug "$RACK_ENV:      "; debug "#{@environment.framework_env}", :yellow
           say ""
       
           # TODO - what if no application deployed yet?
@@ -92,7 +92,7 @@ module Heroku2EY
           
           say "Testing AppCloud application status..."
           
-          deploy_path_found = ssh_appcloud "test -d #{@appcloud_app_name}/current && echo 'found'", 
+          deploy_path_found = ssh_appcloud "test -d #{@app.name}/current && echo 'found'", 
             :path => '/data', :return_output => true
           unless deploy_path_found =~ /found/
             error "Please deploy your AppCloud application before running migration."
@@ -101,7 +101,7 @@ module Heroku2EY
           say "Setting up Heroku on AppCloud..."
 
           ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
-          ssh_appcloud "git remote add heroku git@heroku.com:heroku2ey-simple-app.git 2> /dev/null"
+          ssh_appcloud "git remote add heroku #{heroku_repo} 2> /dev/null"
 
           say "Uploading Heroku credential file..."
           home_path = ssh_appcloud("pwd", :path => "~", :return_output => true)
@@ -113,7 +113,7 @@ module Heroku2EY
           end
           say ""
           
-          say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@appcloud_app_name}'..."
+          say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@app.name}'..."
           env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{environment.framework_env}" }.join(" ")
           ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name}"
           say ""
@@ -136,7 +136,7 @@ module Heroku2EY
 
     private
     def ssh_appcloud(cmd, options = {})
-      path  = options[:path] || "/data/#{@appcloud_app_name}/current/"
+      path  = options[:path] || "/data/#{@app.name}/current/"
       flags = " #{options[:flags]}" || "" if options[:flags] # app master by default
       full_cmd = "cd #{path}; #{cmd}"
       ssh_cmd = "ey ssh #{Escape.shell_command(full_cmd)}#{flags}"
