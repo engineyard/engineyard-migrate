@@ -24,8 +24,8 @@ Gem::Specification.new do |s|
   s.add_dependency("taps", ["~> 0.3.15"])
   s.add_dependency("POpen4", ["~> 0.1.4"])
   s.add_dependency("net-sftp", ["~> 2.0.5"])
-  s.add_dependency("awesome_print")
 
+  s.add_development_dependency("awesome_print")
   s.add_development_dependency("builder", ["2.1.2"]) # for test app
   s.add_development_dependency("rails", ["~> 3.0.3"]) # for test app
   s.add_development_dependency("rake", ["~> 0.8.7"])

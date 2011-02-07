@@ -122,4 +122,8 @@ The remaining known Heroku addons are:
 
 For the test Heroku + AppCloud accounts, the email is `ossgrants+heroku2ey@engineyard.com` and password `heroku2ey`.
 
+### Dependencies
+
+`engineyard ~> 1.3.15pre` is specifically to include pull request https://github.com/engineyard/engineyard/pull/107
+
 
