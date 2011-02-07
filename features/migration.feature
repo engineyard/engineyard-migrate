@@ -81,7 +81,7 @@ Feature: Migration
     And I run executable "git" with arguments "remote rm origin"
     And I run executable "git" with arguments "remote add origin git@github.com:engineyard/UNKNOWN.git"
     
-    When I run local executable "heroku2ey" with arguments "migrate ."
+    When I run local executable "heroku2ey" with arguments "migrate . -e heroku2eysimpleapp_production"
     Then I should see
       """
       Please create, boot and deploy an AppCloud application for git@github.com:engineyard/UNKNOWN.git.
@@ -113,7 +113,7 @@ Feature: Migration
     Given I have setup my AppCloud credentials
     And I remove AppCloud application "heroku2eysimpleapp" folder
 
-    When I run local executable "heroku2ey" with arguments "migrate ."
+    When I run local executable "heroku2ey" with arguments "migrate . -e heroku2eysimpleapp_production"
     Then I should see
       """
       Please deploy your AppCloud application before running migration.

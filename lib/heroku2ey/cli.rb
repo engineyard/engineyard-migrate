@@ -139,7 +139,7 @@ module Heroku2EY
       path  = options[:path] || "/data/#{@app.name}/current/"
       flags = " #{options[:flags]}" || "" if options[:flags] # app master by default
       full_cmd = "cd #{path}; #{cmd}"
-      ssh_cmd = "ey ssh #{Escape.shell_command(full_cmd)}#{flags}"
+      ssh_cmd = "ey ssh #{Escape.shell_command(full_cmd)}#{flags} -e #{@environment.name} -c #{@environment.account.name}"
       debug options[:return_output] ? "Capturing: " : "Running: "
       debug ssh_cmd, :yellow; $stdout.flush
       out = ""
