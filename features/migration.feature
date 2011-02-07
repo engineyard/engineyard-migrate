@@ -88,9 +88,19 @@ Feature: Migration
       """
 
   Scenario: Fail if environment hasn't been booted yet
-    Given context
-    When event
-    Then outcome
+    Given I have setup my SSH keys
+    And I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
+
+    And I have setup my Heroku credentials
+    And I have a Heroku application "heroku2ey-simple-app"
+
+    Given I have setup my AppCloud credentials
+
+    When I run local executable "heroku2ey" with arguments "migrate . -e heroku2ey_noinstances"
+    Then I should see
+      """
+      Please boot your AppCloud environment and then deploy your application.
+      """
   
   # the environment exists via 'ey environments'; but /data/appname/current doesn't exist
   Scenario: Fail if application hasn't been deployed yet

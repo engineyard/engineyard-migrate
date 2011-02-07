@@ -58,6 +58,9 @@ module Heroku2EY
           unless app.repository_uri == repo
             error "Please create, boot and deploy an AppCloud application for #{repo}."
           end
+          unless environment.app_master
+            error "Please boot your AppCloud environment and then deploy your application."
+          end
 
           @appcloud_app_name = app.name
           app_master_host = environment.app_master.public_hostname
