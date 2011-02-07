@@ -87,3 +87,29 @@ Feature: Migration
       Please create, boot and deploy an AppCloud application for git@github.com:engineyard/UNKNOWN.git.
       """
 
+  Scenario: Fail if environment hasn't been booted yet
+    Given context
+    When event
+    Then outcome
+  
+  # the environment exists via 'ey environments'; but /data/appname/current doesn't exist
+  Scenario: Fail if application hasn't been deployed yet
+    Given I have setup my SSH keys
+    And I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
+
+    And I have setup my Heroku credentials
+    And I have a Heroku application "heroku2ey-simple-app"
+
+    Given I have setup my AppCloud credentials
+    And I remove AppCloud application "heroku2eysimpleapp" folder
+
+    When I run local executable "heroku2ey" with arguments "migrate ."
+    Then I should see
+      """
+      Please deploy your AppCloud application before running migration.
+      """
+  
+  
+  
+  
+  

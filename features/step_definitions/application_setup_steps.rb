@@ -90,4 +90,11 @@ Given /^I reset the AppCloud application "([^"]*)" database$/ do |app_name|
   end
 end
 
+# Actually moves it to .../current.bak; which is restored after the scenario
+Given /^I remove AppCloud application "([^"]*)" folder$/ do |app_name|
+  in_project_folder do
+    remove_from_appcloud("/data/#{app_name}/current")
+  end
+end
+
 

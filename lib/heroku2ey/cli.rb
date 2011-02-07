@@ -86,6 +86,14 @@ module Heroku2EY
           #        "user" => "deploy",
           #     "weekday" => "*"
           # }
+          
+          say "Testing AppCloud application status..."
+          
+          deploy_path_found = ssh_appcloud "test -d #{@appcloud_app_name}/current && echo 'found'", 
+            :path => '/data', :return_output => true
+          unless deploy_path_found =~ /found/
+            error "Please deploy your AppCloud application before running migration."
+          end
       
           say "Setting up Heroku on AppCloud..."
 
@@ -127,7 +135,8 @@ module Heroku2EY
     def ssh_appcloud(cmd, options = {})
       path  = options[:path] || "/data/#{@appcloud_app_name}/current/"
       flags = " #{options[:flags]}" || "" if options[:flags] # app master by default
-      ssh_cmd = "ey ssh 'cd #{path}; #{cmd}'#{flags}"
+      full_cmd = "cd #{path}; #{cmd}"
+      ssh_cmd = "ey ssh #{Escape.shell_command(full_cmd)}#{flags}"
       debug options[:return_output] ? "Capturing: " : "Running: "
       debug ssh_cmd, :yellow; $stdout.flush
       out = ""
