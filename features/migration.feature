@@ -17,7 +17,7 @@ Feature: Migration
       | Danish |
 
     Given I have setup my AppCloud credentials
-    And I reset the AppCloud application "heroku2eysimpleapp" database
+    And I reset the AppCloud "heroku2eysimpleapp_production" application "heroku2eysimpleapp" database
     When I visit the application at "ec2-50-17-248-148.compute-1.amazonaws.com"
     Then I should see table
       | People |
@@ -86,7 +86,20 @@ Feature: Migration
       """
       Please create, boot and deploy an AppCloud application for git@github.com:engineyard/UNKNOWN.git.
       """
+  
+  Scenario: Fail if too many AppCloud environments match
+    Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
+    And I have a Heroku application "heroku2ey-simple-app"
+    And I have setup my SSH keys
+    And I have setup my Heroku credentials
 
+    Given I have setup my AppCloud credentials
+    When I run local executable "heroku2ey" with arguments "migrate ."
+    Then I should see
+      """
+      Multiple environments possible, please be more specific:
+      """
+  
   Scenario: Fail if environment hasn't been booted yet
     Given I have setup my SSH keys
     And I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
@@ -102,7 +115,6 @@ Feature: Migration
       Please boot your AppCloud environment and then deploy your application.
       """
   
-  # the environment exists via 'ey environments'; but /data/appname/current doesn't exist
   Scenario: Fail if application hasn't been deployed yet
     Given I have setup my SSH keys
     And I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
@@ -111,7 +123,7 @@ Feature: Migration
     And I have a Heroku application "heroku2ey-simple-app"
 
     Given I have setup my AppCloud credentials
-    And I remove AppCloud application "heroku2eysimpleapp" folder
+    And I remove AppCloud "heroku2eysimpleapp_production" application "heroku2eysimpleapp" folder
 
     When I run local executable "heroku2ey" with arguments "migrate . -e heroku2eysimpleapp_production"
     Then I should see

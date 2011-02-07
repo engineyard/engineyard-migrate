@@ -120,6 +120,12 @@ module Heroku2EY
           
           say "Migration complete!", :green
         rescue SystemExit
+        rescue EY::MultipleMatchesError => e
+          envs = []
+          e.message.scan(/--environment='([^']+)' --account='([^']+)'/) do
+            envs << [$1, $2]
+          end
+          too_many_environments_discovered 'migrate', envs
         rescue Net::SSH::AuthenticationFailed => e
           error "Please setup your SSH credentials for AppCloud."
         rescue Net::SFTP::StatusException => e
@@ -192,10 +198,11 @@ module Heroku2EY
     def too_many_environments_discovered(task, environments)
       say "Multiple environments possible, please be more specific:", :red
       say ""
-      environments.each do |env_name, account_name, environment|
+      environments.each do |env_name, account_name|
         say "  heroku2ey #{task} --environment "; say "'#{env_name}' ", :yellow; 
           say "--account "; say "'#{account_name}'", :yellow
       end
+      exit 1
     end
     
   end

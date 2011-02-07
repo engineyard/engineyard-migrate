@@ -82,18 +82,18 @@ Given /^I have setup my AppCloud credentials$/ do
   end
 end
 
-Given /^I reset the AppCloud application "([^"]*)" database$/ do |app_name|
+Given /^I reset the AppCloud "([^"]*)" application "([^"]*)" database$/ do |environment, app_name|
   in_project_folder do
     @stdout = File.expand_path(File.join(@tmp_root, "eyssh.out"))
     @stderr = File.expand_path(File.join(@tmp_root, "eyssh.err"))
-    system "ey ssh 'cd /data/#{app_name}/current/; RAILS_ENV=production rake db:schema:load' > #{@stdout.inspect} 2> #{@stderr.inspect}"
+    system "ey ssh 'cd /data/#{app_name}/current/; RAILS_ENV=production rake db:schema:load' -e #{environment} > #{@stdout.inspect} 2> #{@stderr.inspect}"
   end
 end
 
 # Actually moves it to .../current.bak; which is restored after the scenario
-Given /^I remove AppCloud application "([^"]*)" folder$/ do |app_name|
+Given /^I remove AppCloud "([^"]*)" application "([^"]*)" folder$/ do |environment, app_name|
   in_project_folder do
-    remove_from_appcloud("/data/#{app_name}/current")
+    remove_from_appcloud("/data/#{app_name}/current", environment)
   end
 end
 
