@@ -84,7 +84,9 @@ end
 
 Given /^I reset the AppCloud application "([^"]*)" database$/ do |app_name|
   in_project_folder do
-    system "ey ssh 'cd /data/#{app_name}/current/; RAILS_ENV=production rake db:schema:load'"
+    @stdout = File.expand_path(File.join(@tmp_root, "eyssh.out"))
+    @stderr = File.expand_path(File.join(@tmp_root, "eyssh.err"))
+    system "ey ssh 'cd /data/#{app_name}/current/; RAILS_ENV=production rake db:schema:load' > #{@stdout.inspect} 2> #{@stderr.inspect}"
   end
 end
 
