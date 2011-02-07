@@ -1,13 +1,12 @@
 require 'thor'
-require 'net/http'
 require 'uri'
-require 'POpen4'
+require 'net/http'
 require 'net/sftp'
+require 'POpen4'
 require 'engineyard/thor'
 require "engineyard/cli"
 require "engineyard/cli/ui"
 require "engineyard/error"
-require "ap"
 
 module Heroku2EY
   class CLI < Thor
