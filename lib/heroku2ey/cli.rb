@@ -114,7 +114,7 @@ module Heroku2EY
           say ""
           
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@app.name}'..."
-          env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{environment.framework_env}" }.join(" ")
+          env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{@environment.framework_env}" }.join(" ")
           ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name}"
           say ""
           
@@ -181,6 +181,7 @@ module Heroku2EY
       exit
     end
 
+    # TODO - not being used yet
     def no_environments_discovered
       say "No AppCloud environments found for this application.", :red
       say "Either:"
