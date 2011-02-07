@@ -11,12 +11,14 @@ require "engineyard/error"
 module Heroku2EY
   class CLI < Thor
     include EY::UtilityMethods
-
+    attr_reader :verbose
+    
     desc "migrate PATH", "Migrate this Heroku app to Engine Yard AppCloud"
     method_option :verbose, :aliases     => ["-V"], :desc => "Display more output"
     method_option :environment, :aliases => ["-e"], :desc => "Environment in which to deploy this application", :type => :string
     method_option :account, :aliases     => ["-c"], :desc => "Name of the account you want to deploy in"
     def migrate(path)
+      @verbose = options[:verbose]
       error "Path '#{path}' does not exist" unless File.exists? path
       FileUtils.chdir(path) do
         begin
@@ -28,7 +30,7 @@ module Heroku2EY
           heroku_app_name = $1
 
           say "Requesting Heroku account information..."; $stdout.flush
-          say "Heroku app:    "; say heroku_app_name, :green
+          say "Heroku app:     "; say heroku_app_name, :green
 
           heroku_credentials = File.expand_path("~/.heroku/credentials")
           unless File.exists?(heroku_credentials)
@@ -61,12 +63,12 @@ module Heroku2EY
           app_master_host = environment.app_master.public_hostname
           app_master_user = environment.username
 
-          say "AppCloud app:  "; say "#{app.name}", :green
-          say "AppCloud acct: "; say "#{environment.account.name}", :yellow
-          say "Environment:   "; say "#{environment.name}", :yellow
-          say "RACK_ENV:      "; say "#{environment.framework_env}", :yellow
-          say "Cluster size:  "; say "#{environment.instances_count}", :yellow
-          say "Hostname:      "; say "#{app_master_host}", :yellow
+          say   "Application:    "; say   "#{app.name}", :green
+          say   "Account:        "; say   "#{environment.account.name}", :yellow
+          say   "Environment:    "; say   "#{environment.name}", :yellow
+          say   "Cluster size:   "; say   "#{environment.instances_count}", :yellow
+          say   "Hostname:       "; say   "#{app_master_host}", :yellow
+          debug "$RACK_ENV:      "; debug "#{environment.framework_env}", :yellow
           say ""
       
           # TODO - what if no application deployed yet?
@@ -85,25 +87,26 @@ module Heroku2EY
           #     "weekday" => "*"
           # }
       
-          say "Setting up Heroku credentials on AppCloud..."
+          say "Setting up Heroku on AppCloud..."
 
-          # setup ~/.heroku/credentials
-          home_path = ssh_appcloud("pwd", :path => "~", :return_output => true)
-          say "AppCloud $HOME: "; say home_path, :yellow
-          ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => home_path
-          
-          debug "Uploading Heroku credential file..."
-          Net::SFTP.start(app_master_host, app_master_user) do |sftp|
-            sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
-          end
-          
           ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
           ssh_appcloud "git remote add heroku git@heroku.com:heroku2ey-simple-app.git 2> /dev/null"
 
+          say "Uploading Heroku credential file..."
+          home_path = ssh_appcloud("pwd", :path => "~", :return_output => true)
+          debug "AppCloud $HOME: "; debug home_path, :yellow
+          ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => home_path
+          
+          Net::SFTP.start(app_master_host, app_master_user) do |sftp|
+            sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
+          end
+          say ""
+          
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@appcloud_app_name}'..."
           env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{environment.framework_env}" }.join(" ")
           ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name}"
-
+          say ""
+          
           say "Migration complete!", :green
         rescue SystemExit
         rescue Net::SSH::AuthenticationFailed => e
@@ -149,7 +152,7 @@ module Heroku2EY
     end
     
     def debug(msg, color = nil)
-      say(msg, color)
+      say(msg, color) if verbose
     end
 
     def display(text)

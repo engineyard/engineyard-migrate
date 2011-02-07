@@ -13,6 +13,10 @@ Given /"(.*)" folder is deleted/ do |folder|
   in_project_folder { FileUtils.rm_rf folder }
 end
 
+Given /file "(.*)" is deleted/ do |file|
+  in_project_folder { FileUtils.rm_rf file }
+end
+
 When /^I invoke "(.*)" generator with arguments "(.*)"$/ do |generator, arguments|
   @stdout = StringIO.new
   in_project_folder do
