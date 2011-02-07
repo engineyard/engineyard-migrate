@@ -89,7 +89,7 @@ module Heroku2EY
           say "Setting up Heroku credentials on AppCloud..."
 
           # setup ~/.heroku/credentials
-          home_path = ssh_appcloud "pwd", :path => "~", :return_output => true
+          home_path = ssh_appcloud("pwd", :path => "~", :return_output => true)
           say "AppCloud $HOME: "; say home_path, :yellow
           ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => home_path
           
