@@ -2,19 +2,30 @@
 
 **DO NOT OPEN SOURCE** until management of passwords/credentials for testing + CI is figured out and the codebase cleaned up + passwords possibly changed.
 
-## Workers
+## Installation
 
-Heroku documentation on their workers/background jobs - [http://devcenter.heroku.com/articles/delayed-job](http://devcenter.heroku.com/articles/delayed-job)
+Currently, it is only installable from source.
 
-## Heroku Addons
+    bundle
+    rake install
+
+## Usage
+
+The tool is simple to use. If you need to do something, it will tell you.
+
+    heroku2ey migrate path/to/heroku/app
+
+## Migration from Salesforce Heroku
 
 ### Database
 
-Example:
+Your SQL database is automatically migrated to your AppCloud application via `heroku2ey migrate`.
 
-    shared-database:20gb, 5mb         
+A MySQL database is created automatically for you for each AppCloud application. On a 1 instance environment it runs on the same instances as your web application. For dedicated databases, use a 2+ instance environment with a dedicated database instance.
 
-A MySQL database is created automatically. On a 1 instance environment it runs on the same instances as your web application. For dedicated databases, use a 2+ instance environment with a dedicated database instance.
+### Workers
+
+Heroku documentation on their workers/background jobs - [http://devcenter.heroku.com/articles/delayed-job](http://devcenter.heroku.com/articles/delayed-job)
 
 ### Custom domains
 
