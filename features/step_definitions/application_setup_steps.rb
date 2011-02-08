@@ -2,6 +2,8 @@ Given /^I have setup my SSH keys$/ do
   in_home_folder do
     FileUtils.cp_r(File.join(@fixtures_path, "credentials/ssh"), ".ssh")
     FileUtils.chmod(0700, ".ssh")
+    FileUtils.chmod(0600, ".ssh/id_rsa")
+    FileUtils.chmod(0600, ".ssh/id_rsa.pub")
   end
 end
 
