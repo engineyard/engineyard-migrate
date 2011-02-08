@@ -21,17 +21,17 @@ Gem::Specification.new do |s|
 
   s.add_dependency("engineyard", ["~> 1.3.15pre"])
   s.add_dependency("heroku", ["~> 1.17.10"])
-  s.add_dependency("taps", ["~> 0.3.15"])
   s.add_dependency("POpen4", ["~> 0.1.4"])
   s.add_dependency("net-sftp", ["~> 2.0.5"])
 
   s.add_development_dependency("awesome_print")
   s.add_development_dependency("builder", ["2.1.2"]) # for test app
-  s.add_development_dependency("rails", ["~> 3.0.3"]) # for test app
+  s.add_development_dependency("rails", ["3.0.3"]) # for test app
   s.add_development_dependency("rake", ["~> 0.8.7"])
   s.add_development_dependency("cucumber", ["~> 0.10.0"])
   s.add_development_dependency("cucumber-rails", ["~> 0.3.2"])
   s.add_development_dependency("rspec", ["~> 2.2.0"])
   s.add_development_dependency("nokogiri", ["~> 1.4.0"])
   s.add_development_dependency("ssh-config")
+  s.add_development_dependency("sqlite3")
 end
