@@ -129,6 +129,20 @@ The remaining known Heroku addons are:
 
 ## Development
 
+### Running tests
+
+Add the following to the end of your /etc/ssh_config file:
+
+    Host ec2-50-17-248-148.compute-1.amazonaws.com
+    IdentityFile /path/to/gem/heroku2ey/tmp/home/.ssh/id_rsa
+
+where the IdentityFile `/path/to/gem/heroku2ey` is the folder where you cloned the repo.
+
+Then to run tests:
+
+    bundle
+    rake
+
 ### Credentials
 
 For the test Heroku + AppCloud accounts, the email is `ossgrants+heroku2ey@engineyard.com` and password `heroku2ey`.
