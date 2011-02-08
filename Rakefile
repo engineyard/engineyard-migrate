@@ -15,10 +15,17 @@ namespace :cucumber do
     t.cucumber_opts = "--tags ~@wip"
   end
   task :all => [:ok, :wip]
+
+  desc "Setup IdentityFile for SSH keys for running tests"
+  task :ssh_config do
+    puts "Installing SSH credentials for running integration tests..."
+    identity_file = File.expand_path("../tmp/home/.ssh/id_rsa", __FILE__)
+    sh "ssh-config set ec2-50-17-248-148.compute-1.amazonaws.com IdentityFile #{identity_file}"
+  end
 end
 
 desc 'Alias for cucumber:ok'
-task :cucumber => 'cucumber:ok'
+task :cucumber => ['cucumber:ssh_config', 'cucumber:ok']
 
 desc "Start test server; Run cucumber:ok; Kill Test Server;"
 task :default => ["spec", "cucumber"]
@@ -29,3 +36,4 @@ task :clean_app_repos do
   FileUtils.rm_rf(repos_path)
   puts "Removed #{repos_path}..."
 end
+

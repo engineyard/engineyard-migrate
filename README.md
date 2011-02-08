@@ -131,17 +131,12 @@ The remaining known Heroku addons are:
 
 ### Running tests
 
-Add the following to the end of your `~/.ssh/config` or `/etc/ssh_config` file:
-
-    Host ec2-50-17-248-148.compute-1.amazonaws.com
-    IdentityFile /path/to/gem/heroku2ey/tmp/home/.ssh/id_rsa
-
-where the IdentityFile `/path/to/gem/heroku2ey` is the folder where you cloned the repo.
-
 Then to run tests:
 
     bundle
     rake
+
+This will install `.ssh/config` required for your SSH credentials to run the test suite.
 
 ### Credentials
 
