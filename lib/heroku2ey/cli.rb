@@ -101,7 +101,7 @@ module Heroku2EY
           say "Setting up Heroku on AppCloud..."
 
           ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
-          ssh_appcloud "git remote add heroku #{heroku_repo} 2> /dev/null"
+          ssh_appcloud "git remote rm heroku 2> /dev/null; git remote add heroku #{heroku_repo} 2> /dev/null"
 
           say "Uploading Heroku credential file..."
           home_path = ssh_appcloud("pwd", :path => "~", :return_output => true)
