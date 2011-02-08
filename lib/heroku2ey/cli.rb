@@ -67,11 +67,11 @@ module Heroku2EY
           app_master_user = @environment.username
 
           say   "Application:    "; say   "#{@app.name}", :green
-          say   "Account:        "; say   "#{@environment.account.name}", :yellow
-          say   "Environment:    "; say   "#{@environment.name}", :yellow
-          say   "Cluster size:   "; say   "#{@environment.instances_count}", :yellow
-          say   "Hostname:       "; say   "#{app_master_host}", :yellow
-          debug "$RACK_ENV:      "; debug "#{@environment.framework_env}", :yellow
+          say   "Account:        "; say   "#{@environment.account.name}", :green
+          say   "Environment:    "; say   "#{@environment.name}", :green
+          say   "Cluster size:   "; say   "#{@environment.instances_count}"
+          say   "Hostname:       "; say   "#{app_master_host}"
+          debug "$RACK_ENV:      "; debug "#{@environment.framework_env}"
           say ""
       
           # TODO - what if no application deployed yet?
