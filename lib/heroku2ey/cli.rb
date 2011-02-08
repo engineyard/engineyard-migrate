@@ -70,7 +70,7 @@ module Heroku2EY
           say   "Account:        "; say   "#{@environment.account.name}", :yellow
           say   "Environment:    "; say   "#{@environment.name}", :yellow
           say   "Cluster size:   "; say   "#{@environment.instances_count}", :yellow
-          say   "Hostname:       "; say   "#{@app_master_host}", :yellow
+          say   "Hostname:       "; say   "#{app_master_host}", :yellow
           debug "$RACK_ENV:      "; debug "#{@environment.framework_env}", :yellow
           say ""
       
