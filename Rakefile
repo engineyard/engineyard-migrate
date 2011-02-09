@@ -24,8 +24,9 @@ namespace :cucumber do
     if File.exist? config_file
       sh "ssh-config set ec2-50-17-248-148.compute-1.amazonaws.com IdentityFile #{identity_file}"
     else
-      system "touch #{config_file}"
+      File.open(config_file, 'w')
       sh "ssh-config set ec2-50-17-248-148.compute-1.amazonaws.com IdentityFile #{identity_file}"
+      File.delete(config_file + '~')
     end
   end
 end
