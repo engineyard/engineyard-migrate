@@ -19,8 +19,14 @@ namespace :cucumber do
   desc "Setup IdentityFile for SSH keys for running tests"
   task :ssh_config do
     puts "Installing SSH credentials for running integration tests..."
+    config_file = File.expand_path("~#{ENV['USER']}/.ssh/config")
     identity_file = File.expand_path("../tmp/home/.ssh/id_rsa", __FILE__)
-    sh "ssh-config set ec2-50-17-248-148.compute-1.amazonaws.com IdentityFile #{identity_file}"
+    if File.exist? config_file
+      sh "ssh-config set ec2-50-17-248-148.compute-1.amazonaws.com IdentityFile #{identity_file}"
+    else
+      system "touch #{config_file}"
+      sh "ssh-config set ec2-50-17-248-148.compute-1.amazonaws.com IdentityFile #{identity_file}"
+    end
   end
 end
 
