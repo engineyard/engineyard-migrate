@@ -122,6 +122,8 @@ module Heroku2EY
         rescue SystemExit
         rescue EY::MultipleMatchesError => e
           envs = []
+          debug e.message
+          
           e.message.scan(/--environment='([^']+)' --account='([^']+)'/) do
             envs << [$1, $2]
           end
