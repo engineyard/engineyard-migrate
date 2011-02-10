@@ -196,6 +196,7 @@ module Heroku2EY
     end
     
     def too_many_environments_discovered(task, environments)
+      return no_environments_discovered if environments.empty?
       say "Multiple environments possible, please be more specific:", :red
       say ""
       environments.each do |env_name, account_name|
