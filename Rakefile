@@ -15,6 +15,14 @@ namespace :cucumber do
     t.cucumber_opts = "--tags ~@wip"
   end
   task :all => [:ok, :wip]
+  
+  desc "Download credentials"
+  task :download_credentials do
+    credentials = File.expand_path('../fixtures/credentials', __FILE__)
+    unless File.exists?(credentials)
+      sh "git clone git@github.com:engineyard/heroku2ey-test-credentials.git #{credentials}"
+    end
+  end
 
   desc "Setup IdentityFile for SSH keys for running tests"
   task :ssh_config do
@@ -32,7 +40,7 @@ namespace :cucumber do
 end
 
 desc 'Alias for cucumber:ok'
-task :cucumber => ['cucumber:ssh_config', 'cucumber:ok']
+task :cucumber => ['cucumber:download_credentials', 'cucumber:ssh_config', 'cucumber:ok']
 
 desc "Start test server; Run cucumber:ok; Kill Test Server;"
 task :default => ["spec", "cucumber"]
