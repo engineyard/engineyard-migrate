@@ -140,10 +140,9 @@ This will install `.ssh/config` required for your SSH credentials to run the tes
 
 ### Credentials
 
-To run the integration tests, you either need access to:
+To run the integration tests, you either need access to the [credentials repository](https://github.com/engineyard/heroku2ey-test-credentials)
 
-* the [credentials repository](https://github.com/engineyard/heroku2ey-test-credentials)
-* an identical pair of Heroku & AppCloud accounts with their own credentials (TODO document this)
+Please send a Github message to `drnic` requesting the test keys/
 
 ### Dependencies
 
