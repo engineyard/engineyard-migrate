@@ -122,12 +122,14 @@ module Heroku2EY
         rescue SystemExit
         rescue EY::MultipleMatchesError => e
           envs = []
-          debug e.message
-          
-          e.message.scan(/--environment='([^']+)' --account='([^']+)'/) do
-            envs << [$1, $2]
+          e.message.split(/\n/).map do |line|
+            env = {}
+            line.scan(/--([^=]+)='([^']+)'/) do
+              env[$1] = $2
+            end
+            envs << env unless env.empty?
           end
-          too_many_environments_discovered 'migrate', envs
+          too_many_environments_discovered 'migrate', envs, path
         rescue Net::SSH::AuthenticationFailed => e
           error "Please setup your SSH credentials for AppCloud."
         rescue Net::SFTP::StatusException => e
@@ -197,13 +199,13 @@ module Heroku2EY
       say "  * Use --environment/--account flags to select an AppCloud environment"
     end
     
-    def too_many_environments_discovered(task, environments)
+    def too_many_environments_discovered(task, environments, *args)
       return no_environments_discovered if environments.empty?
       say "Multiple environments possible, please be more specific:", :red
       say ""
-      environments.each do |env_name, account_name|
-        say "  heroku2ey #{task} --environment "; say "'#{env_name}' ", :yellow; 
-          say "--account "; say "'#{account_name}'", :yellow
+      environments.each do |env|
+        flags = env.map { |key, value| "--#{key}='#{value}'"}.join(" ")
+        say "  heroku2ey #{task} #{args.join(' ')} #{flags}"
       end
       exit 1
     end

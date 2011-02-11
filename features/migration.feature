@@ -94,10 +94,12 @@ Feature: Migration
     And I have setup my Heroku credentials
 
     Given I have setup my AppCloud credentials
-    When I run local executable "heroku2ey" with arguments "migrate ."
+    When I run local executable "heroku2ey" with arguments "migrate . -V"
+    Then I should see "Multiple environments possible, please be more specific:"
     Then I should see
       """
-      Multiple environments possible, please be more specific:
+        heroku2ey migrate . --app='heroku2eysimpleapp' --account='heroku2ey' --environment='heroku2eysimpleapp_production'
+        heroku2ey migrate . --app='heroku2eysimpleapp' --account='heroku2ey' --environment='heroku2ey_noinstances'
       """
   
   Scenario: Fail if environment hasn't been booted yet
