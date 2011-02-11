@@ -140,7 +140,10 @@ This will install `.ssh/config` required for your SSH credentials to run the tes
 
 ### Credentials
 
-For the test Heroku + AppCloud accounts, the email is `ossgrants+heroku2ey@engineyard.com` and password `heroku2ey`.
+To run the integration tests, you either need access to:
+
+* the [credentials repository](https://github.com/engineyard/heroku2ey-test-credentials)
+* an identical pair of Heroku & AppCloud accounts with their own credentials (TODO document this)
 
 ### Dependencies
 
