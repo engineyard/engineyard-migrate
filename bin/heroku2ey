@@ -5,4 +5,6 @@ $:.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
 require 'heroku2ey'
 require 'heroku2ey/cli'
 
+$stdout.sync = true
+
 Heroku2EY::CLI.start
