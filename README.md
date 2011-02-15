@@ -1,6 +1,6 @@
-# Salesforce Heroku to Engine Yard AppCloud migration tool
+# Migrate your Rails application to Engine Yard AppCloud
 
-**DO NOT OPEN SOURCE** until management of passwords/credentials for testing + CI is figured out and the codebase cleaned up + passwords possibly changed.
+Want to migrate your Ruby on Rails application from Heroku (or similar) up to Engine Yard AppCloud? This is the tool for you.
 
 ## Installation
 

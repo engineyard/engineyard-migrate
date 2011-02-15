@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Dr Nic Williams", "Danish Khan"]
   s.email       = ["drnicwilliams@gmail.com"]
   s.homepage    = "https://github.com/engineyard/engineyard-migrate"
-  s.summary     = %q{Salesforce Heroku to Engine Yard AppCloud migration tool.}
-  s.description = %q{Migrating your Ruby/Rails application from Salesforce Heroku to Engine Yard AppCloud made simple!}
+  s.summary     = %q{Migrate up to Engine Yard AppCloud from Heroku or similar.}
+  s.description = %q{Want to migrate your Ruby on Rails application from Heroku (or similar) up to Engine Yard AppCloud? This is the tool for you.}
 
   s.rubyforge_project = "engineyard-migrate"
 
