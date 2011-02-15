@@ -142,7 +142,7 @@ This will install `.ssh/config` required for your SSH credentials to run the tes
 
 To run the integration tests, you either need access to the [credentials repository](https://github.com/engineyard/ey-migrate-test-credentials)
 
-Please send a Github message to `drnic` requesting the test keys/
+Please send a Github message to `drnic` requesting access to the credentials. You'll then be able to run the test suite.
 
 ### Dependencies
 
