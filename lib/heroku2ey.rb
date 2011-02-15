@@ -1,3 +1,0 @@
-module Heroku2EY
-  # Your code goes here...
-end

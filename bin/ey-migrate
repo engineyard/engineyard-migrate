@@ -2,9 +2,9 @@
 
 require 'rubygems'
 $:.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
-require 'heroku2ey'
-require 'heroku2ey/cli'
+require 'engineyard-migrate'
+require 'engineyard-migrate/cli'
 
 $stdout.sync = true
 
-Heroku2EY::CLI.start
+Engineyard::Migrate::CLI.start

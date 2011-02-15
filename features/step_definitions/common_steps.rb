@@ -48,13 +48,13 @@ When /^I run project executable "(.*)" with arguments "(.*)"/ do |executable, ar
 end
 
 When /^I run local executable "(.*)" with arguments "(.*)"/ do |executable, arguments|
-  if executable == "heroku2ey"
-    require 'heroku2ey'
-    require 'heroku2ey/cli'
+  if executable == "ey-migrate"
+    require 'engineyard-migrate'
+    require 'engineyard-migrate/cli'
     in_project_folder do
       stdout, stderr = capture_stdios do
         begin
-          Heroku2EY::CLI.start(arguments.split(/ /))
+          Engineyard::Migrate::CLI.start(arguments.split(/ /))
         rescue SystemExit
         end
       end

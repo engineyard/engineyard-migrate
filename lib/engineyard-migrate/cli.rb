@@ -8,7 +8,7 @@ require "engineyard/cli"
 require "engineyard/cli/ui"
 require "engineyard/error"
 
-module Heroku2EY
+module Engineyard::Migrate
   class CLI < Thor
     include EY::UtilityMethods
     attr_reader :verbose
@@ -205,7 +205,7 @@ module Heroku2EY
       say ""
       environments.each do |env|
         flags = env.map { |key, value| "--#{key}='#{value}'"}.join(" ")
-        say "  heroku2ey #{task} #{args.join(' ')} #{flags}"
+        say "  ey-migrate #{task} #{args.join(' ')} #{flags}"
       end
       exit 1
     end

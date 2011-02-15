@@ -1,4 +1,4 @@
 source "http://rubygems.org"
 
-# Specify your gem's dependencies in heroku2ey.gemspec
+# Specify your gem's dependencies in engineyard-migrate.gemspec
 gemspec

@@ -20,7 +20,7 @@ namespace :cucumber do
   task :download_credentials do
     credentials = File.expand_path('../fixtures/credentials', __FILE__)
     unless File.exists?(credentials)
-      sh "git clone git@github.com:engineyard/heroku2ey-test-credentials.git #{credentials}"
+      sh "git clone git@github.com:engineyard/ey-migrate-test-credentials.git #{credentials}"
     end
   end
 

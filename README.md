@@ -13,13 +13,13 @@ Currently, it is only installable from source.
 
 The tool is simple to use. If you need to do something, it will tell you.
 
-    heroku2ey migrate path/to/heroku/app
+    ey-migrate migrate path/to/heroku/app
 
 ## Migration from Salesforce Heroku
 
 ### Database
 
-Your SQL database is automatically migrated to your AppCloud application via `heroku2ey migrate`.
+Your SQL database is automatically migrated to your AppCloud application via `ey-migrate migrate`.
 
 A MySQL database is created automatically for you for each AppCloud application. On a 1 instance environment it runs on the same instances as your web application. For dedicated databases, use a 2+ instance environment with a dedicated database instance.
 
@@ -140,7 +140,7 @@ This will install `.ssh/config` required for your SSH credentials to run the tes
 
 ### Credentials
 
-To run the integration tests, you either need access to the [credentials repository](https://github.com/engineyard/heroku2ey-test-credentials)
+To run the integration tests, you either need access to the [credentials repository](https://github.com/engineyard/ey-migrate-test-credentials)
 
 Please send a Github message to `drnic` requesting the test keys/
 
