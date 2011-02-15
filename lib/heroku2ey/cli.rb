@@ -94,9 +94,7 @@ module Heroku2EY
           
           deploy_path_found = ssh_appcloud "test -d #{@app.name}/current && echo 'found'", 
             :path => '/data', :return_output => true
-          unless deploy_path_found =~ /found/
-            error "Please deploy your AppCloud application before running migration."
-          end
+          error "Please deploy your AppCloud application before running migration." unless deploy_path_found =~ /found/
       
           say "Setting up Heroku on AppCloud..."
 
