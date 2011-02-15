@@ -13,13 +13,13 @@ Currently, it is only installable from source.
 
 The tool is simple to use. If you need to do something, it will tell you.
 
-    ey-migrate migrate path/to/heroku/app
+    ey-migrate heroku path/to/heroku/app
 
 ## Migration from Salesforce Heroku
 
 ### Database
 
-Your SQL database is automatically migrated to your AppCloud application via `ey-migrate migrate`.
+Your SQL database is automatically migrated to your AppCloud application via `ey-migrate heroku`.
 
 A MySQL database is created automatically for you for each AppCloud application. On a 1 instance environment it runs on the same instances as your web application. For dedicated databases, use a 2+ instance environment with a dedicated database instance.
 

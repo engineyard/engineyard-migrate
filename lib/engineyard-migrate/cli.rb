@@ -13,11 +13,11 @@ module Engineyard::Migrate
     include EY::UtilityMethods
     attr_reader :verbose
     
-    desc "migrate PATH", "Migrate this Heroku app to Engine Yard AppCloud"
+    desc "heroku PATH", "Migrate this Heroku app to Engine Yard AppCloud"
     method_option :verbose, :aliases     => ["-V"], :desc => "Display more output"
     method_option :environment, :aliases => ["-e"], :desc => "Environment in which to deploy this application", :type => :string
     method_option :account, :aliases     => ["-c"], :desc => "Name of the account you want to deploy in"
-    def migrate(path)
+    def heroku(path)
       @verbose = options[:verbose]
       error "Path '#{path}' does not exist" unless File.exists? path
       FileUtils.chdir(path) do
@@ -129,7 +129,7 @@ module Engineyard::Migrate
             end
             envs << env unless env.empty?
           end
-          too_many_environments_discovered 'migrate', envs, path
+          too_many_environments_discovered 'heroku', envs, path
         rescue Net::SSH::AuthenticationFailed => e
           error "Please setup your SSH credentials for AppCloud."
         rescue Net::SFTP::StatusException => e

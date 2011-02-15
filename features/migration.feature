@@ -22,7 +22,7 @@ Feature: Migration
     Then I should see table
       | People |
 
-    When I run local executable "ey-migrate" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
+    When I run local executable "ey-migrate" with arguments "heroku . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see "Migration complete!"
     When I visit the application at "ec2-50-17-248-148.compute-1.amazonaws.com"
     Then I should see table
@@ -32,7 +32,7 @@ Feature: Migration
   
   Scenario: Fail if application isn't on Heroku
     Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
-    When I run local executable "ey-migrate" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
+    When I run local executable "ey-migrate" with arguments "heroku . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see
       """
       Not a Salesforce Heroku application.
@@ -41,7 +41,7 @@ Feature: Migration
   Scenario: Fail if Heroku credentials not available
     Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
     And I have a Heroku application "heroku2ey-simple-app"
-    When I run local executable "ey-migrate" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
+    When I run local executable "ey-migrate" with arguments "heroku . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see
       """
       Please setup your Salesforce Heroku credentials first.
@@ -53,7 +53,7 @@ Feature: Migration
     And I have setup my SSH keys
     And I have setup my Heroku credentials
     Given I run executable "git" with arguments "remote rm origin"
-    When I run local executable "ey-migrate" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
+    When I run local executable "ey-migrate" with arguments "heroku . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see
       """
       Please host your Git repo externally and add as remote 'origin'.
@@ -65,7 +65,7 @@ Feature: Migration
     And I have setup my SSH keys
     And I have setup my Heroku credentials
 
-    When I run local executable "ey-migrate" with arguments "migrate . --account heroku2ey --environment heroku2eysimpleapp_production"
+    When I run local executable "ey-migrate" with arguments "heroku . --account heroku2ey --environment heroku2eysimpleapp_production"
     Then I should see
       """
       Please create, boot and deploy an AppCloud application for git@github.com:engineyard/heroku2ey-simple-app.git.
@@ -81,7 +81,7 @@ Feature: Migration
     And I run executable "git" with arguments "remote rm origin"
     And I run executable "git" with arguments "remote add origin git@github.com:engineyard/UNKNOWN.git"
     
-    When I run local executable "ey-migrate" with arguments "migrate . -e heroku2eysimpleapp_production"
+    When I run local executable "ey-migrate" with arguments "heroku . -e heroku2eysimpleapp_production"
     Then I should see
       """
       Please create, boot and deploy an AppCloud application for git@github.com:engineyard/UNKNOWN.git.
@@ -94,12 +94,12 @@ Feature: Migration
     And I have setup my Heroku credentials
 
     Given I have setup my AppCloud credentials
-    When I run local executable "ey-migrate" with arguments "migrate . -V"
+    When I run local executable "ey-migrate" with arguments "heroku . -V"
     Then I should see "Multiple environments possible, please be more specific:"
     Then I should see
       """
-        ey-migrate migrate . --app='heroku2eysimpleapp' --account='heroku2ey' --environment='heroku2eysimpleapp_production'
-        ey-migrate migrate . --app='heroku2eysimpleapp' --account='heroku2ey' --environment='heroku2ey_noinstances'
+        ey-migrate heroku . --app='heroku2eysimpleapp' --account='heroku2ey' --environment='heroku2eysimpleapp_production'
+        ey-migrate heroku . --app='heroku2eysimpleapp' --account='heroku2ey' --environment='heroku2ey_noinstances'
       """
         
   
@@ -112,7 +112,7 @@ Feature: Migration
 
     Given I have setup my AppCloud credentials
 
-    When I run local executable "ey-migrate" with arguments "migrate . -e heroku2ey_noinstances"
+    When I run local executable "ey-migrate" with arguments "heroku . -e heroku2ey_noinstances"
     Then I should see
       """
       Please boot your AppCloud environment and then deploy your application.
@@ -128,7 +128,7 @@ Feature: Migration
     Given I have setup my AppCloud credentials
     And I remove AppCloud "heroku2eysimpleapp_production" application "heroku2eysimpleapp" folder
 
-    When I run local executable "ey-migrate" with arguments "migrate . -e heroku2eysimpleapp_production"
+    When I run local executable "ey-migrate" with arguments "heroku . -e heroku2eysimpleapp_production"
     Then I should see
       """
       Please deploy your AppCloud application before running migration.
