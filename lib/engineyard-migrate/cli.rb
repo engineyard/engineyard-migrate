@@ -115,7 +115,7 @@ module Engineyard::Migrate
           
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@app.name}'..."
           env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{@environment.framework_env}" }.join(" ")
-          ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name}"
+          ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name} 2>&1"
           say ""
           
           say "Migration complete!", :green
@@ -157,12 +157,12 @@ module Engineyard::Migrate
         POpen4::popen4(ssh_cmd) do |stdout, stderr, stdin, pid|
           if options[:return_output]
             out += stdout.read.strip
+            err = stderr.read.strip; say err unless err.empty?
           else
-            out = stdout.read.strip
-            say out unless out.empty?
+            while line = stdout.gets("\n") || stderr.gets("\n")
+              say line
+            end
           end
-          err = stderr.read.strip
-          say err unless err.empty?
         end
         
        puts "exitstatus : #{ status.exitstatus }" unless status.exitstatus == 0
