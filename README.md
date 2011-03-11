@@ -4,6 +4,8 @@ Want to migrate your Ruby on Rails application from Heroku (or similar) up to En
 
 Currently supported: **Migrate Heroku to AppCloud**.
 
+<img src="https://img.skitch.com/20110311-bbtk63ht5272jt2q2wsm3kh22c.png">
+
 ## Installation
 
 Currently, it is only installable from source.
