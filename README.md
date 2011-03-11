@@ -2,6 +2,8 @@
 
 Want to migrate your Ruby on Rails application from Heroku (or similar) up to Engine Yard AppCloud? This is the tool for you.
 
+Currently supported: **Migrate Heroku to AppCloud**.
+
 ## Installation
 
 Currently, it is only installable from source.
