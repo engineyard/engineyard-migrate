@@ -19,8 +19,8 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency("engineyard", ["~> 1.3.16"])
-  s.add_dependency("heroku", ["~> 1.17.10"])
+  s.add_dependency("engineyard")
+  s.add_dependency("heroku")
   s.add_dependency("POpen4", ["~> 0.1.4"])
   s.add_dependency("net-sftp", ["~> 2.0.5"])
 
