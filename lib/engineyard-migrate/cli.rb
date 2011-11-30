@@ -48,7 +48,7 @@ module Engineyard::Migrate
               $ gh create-from-local --private
             SUGGESTION
           end
-          unless EY::API.read_token
+          unless EY::API.new.token
             error "Please create, boot and deploy an AppCloud application for #{repo}."
           end
 
