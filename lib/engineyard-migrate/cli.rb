@@ -12,7 +12,7 @@ module Engineyard::Migrate
   class CLI < Thor
     include EY::UtilityMethods
     attr_reader :verbose
-    
+
     desc "heroku PATH", "Migrate this Heroku app to Engine Yard AppCloud"
     method_option :verbose, :aliases     => ["-V"], :desc => "Display more output"
     method_option :environment, :aliases => ["-e"], :desc => "Environment in which to deploy this application", :type => :string
@@ -39,7 +39,7 @@ module Engineyard::Migrate
 
           say `heroku info`
           say ""
-          
+
           repo = `git config remote.origin.url`.strip
           if repo.empty?
             error "Please host your Git repo externally and add as remote 'origin'.", <<-SUGGESTION.gsub(/^\s{12}/, '')
@@ -51,7 +51,7 @@ module Engineyard::Migrate
           unless EY::API.read_token
             error "Please create, boot and deploy an AppCloud application for #{repo}."
           end
-          
+
           say "Requesting AppCloud account information..."; $stdout.flush
           @app, @environment = fetch_app_and_environment(options[:app], options[:environment], options[:account])
 
@@ -73,7 +73,7 @@ module Engineyard::Migrate
           say   "Hostname:       "; say   "#{app_master_host}"
           debug "$RACK_ENV:      "; debug "#{@environment.framework_env}"
           say ""
-      
+
           # TODO - what if no application deployed yet?
           # bash: line 0: cd: /data/heroku2eysimpleapp/current: No such file or directory
 
@@ -89,13 +89,13 @@ module Engineyard::Migrate
           #        "user" => "deploy",
           #     "weekday" => "*"
           # }
-          
+
           say "Testing AppCloud application status..."
-          
-          deploy_path_found = ssh_appcloud "test -d #{@app.name}/current && echo 'found'", 
+
+          deploy_path_found = ssh_appcloud "test -d #{@app.name}/current && echo 'found'",
             :path => '/data', :return_output => true
           error "Please deploy your AppCloud application before running migration." unless deploy_path_found =~ /found/
-      
+
           say "Setting up Heroku on AppCloud..."
 
           ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
@@ -105,17 +105,17 @@ module Engineyard::Migrate
           home_path = ssh_appcloud("pwd", :path => "~", :return_output => true)
           debug "AppCloud $HOME: "; debug home_path, :yellow
           ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => home_path
-          
+
           Net::SFTP.start(app_master_host, app_master_user) do |sftp|
             sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
           end
           say ""
-          
+
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@app.name}'..."
           env_vars = %w[RAILS_ENV RACK_ENV MERB_ENV].map {|var| "#{var}=#{@environment.framework_env}" }.join(" ")
           ssh_appcloud "#{env_vars} heroku db:pull --confirm #{heroku_app_name} 2>&1"
           say ""
-          
+
           say "Migration complete!", :green
         rescue SystemExit
         rescue EY::MultipleMatchesError => e
@@ -139,7 +139,7 @@ module Engineyard::Migrate
         end
       end
     end
-    
+
     map "-v" => :version, "--version" => :version, "-h" => :help, "--help" => :help
 
     private
@@ -162,15 +162,15 @@ module Engineyard::Migrate
             end
           end
         end
-        
+
        puts "exitstatus : #{ status.exitstatus }" unless status.exitstatus == 0
        out if options[:return_output]
     end
-    
+
     def say(msg, color = nil)
       color ? shell.say(msg, color) : shell.say(msg)
     end
-    
+
     def debug(msg, color = nil)
       say(msg, color) if verbose
     end
@@ -196,7 +196,7 @@ module Engineyard::Migrate
       say "  * Create an AppCloud environment for this application/git URL"
       say "  * Use --environment/--account flags to select an AppCloud environment"
     end
-    
+
     def too_many_environments_discovered(task, environments, *args)
       return no_environments_discovered if environments.empty?
       say "Multiple environments possible, please be more specific:", :red
@@ -207,6 +207,6 @@ module Engineyard::Migrate
       end
       exit 1
     end
-    
+
   end
 end
