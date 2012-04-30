@@ -93,7 +93,7 @@ module Engineyard::Migrate
 
           say "Setting up Heroku on AppCloud..."
 
-          ssh_appcloud "sudo gem install heroku taps sqlite3 --no-ri --no-rdoc -q"
+          ssh_appcloud "sudo gem install heroku taps sqlite3 mysql2 pg --no-ri --no-rdoc -q"
           ssh_appcloud "git remote rm heroku 2> /dev/null; git remote add heroku #{heroku_repo} 2> /dev/null"
 
           say "Uploading Heroku credential file..."
