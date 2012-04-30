@@ -93,17 +93,20 @@ module Engineyard::Migrate
 
           say "Setting up Heroku on AppCloud..."
 
-          ssh_appcloud "sudo gem install heroku taps --no-ri --no-rdoc -q"
+          ssh_appcloud "sudo gem install heroku taps sqlite3 --no-ri --no-rdoc -q"
           ssh_appcloud "git remote rm heroku 2> /dev/null; git remote add heroku #{heroku_repo} 2> /dev/null"
 
           say "Uploading Heroku credential file..."
           home_path = ssh_appcloud("pwd", :path => "~", :return_output => true)
           debug "AppCloud $HOME: "; debug home_path, :yellow
-          ssh_appcloud "mkdir -p .heroku; chmod 700 .heroku", :path => home_path
 
+          require 'heroku/auth'
+          netrc_file = File.basename(Heroku::Auth.netrc_path)
+          remote_netrc = File.join(home_path, ".netrc")
           Net::SFTP.start(app_master_host, app_master_user) do |sftp|
-            sftp.upload!(heroku_credentials, "#{home_path}/.heroku/credentials")
+            sftp.upload!(Heroku::Auth.netrc_path, remote_netrc)
           end
+          ssh_appcloud("chmod 0600 #{remote_netrc}")
           say ""
 
           say "Migrating data from Heroku '#{heroku_app_name}' to AppCloud '#{@app.name}'..."
