@@ -9,15 +9,6 @@ Feature: Migration errors
       Not a Salesforce Heroku application.
       """
 
-  Scenario: Fail if Heroku credentials not available
-    Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
-    And I have a Heroku application "heroku2ey-simple-app"
-    When I run local executable "ey-migrate" with arguments "heroku . --account heroku2ey --environment heroku2eysimpleapp_production"
-    Then I should see
-      """
-      Please setup your Salesforce Heroku credentials first.
-      """
-
   Scenario: Fail if no Git 'origin' repo URI
     Given I clone the application "git@github.com:engineyard/heroku2ey-simple-app.git" as "simple-app"
     And I have a Heroku application "heroku2ey-simple-app"
